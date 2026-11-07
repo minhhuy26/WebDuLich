@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Hành Khách - Đặt Vé Tàu Hỏa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('trains')}"></header>
+
+    <main class="main-content" style="padding-top: 30px;">
+        <div class="app-container-sm" style="max-width: 900px;">
+
+            <!-- STEP BREADCRUMB -->
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                <span>1. Tìm chuyến tàu</span> &rarr;
+                <span>2. Chọn toa &amp; Chỗ ngồi</span> &rarr;
+                <span style="font-weight: 700; color: var(--train-accent);">3. Nhập hành khách &amp; Giữ chỗ</span> &rarr;
+                <span>4. Xuất vé</span>
+            </div>
+
+            <!-- ONE-WAY SUMMARY CARD -->
+            <div class="card" style="border-radius: var(--radius-lg); border-left: 4px solid var(--train-accent); margin-bottom: 24px; padding: 18px 24px; background: #fffbeb;" 
+                 th:if="${train != null and !isRoundTrip}">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: 800; color: #b45309;" th:text="'Đoàn Tàu ' + ${train.trainCode} + ' (' + ${train.routeName} + ')'">SE1</div>
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">
+                            <strong th:text="${depStation.stationName}">Hà Nội</strong> &rarr;
+                            <strong th:text="${arrStation.stationName}">Đà Nẵng</strong> &bull;
+                            Cự ly: <strong th:text="${distanceKm + ' km'}">791 km</strong>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <small style="color: var(--text-muted); display: block;">Ngày khởi hành:</small>
+                        <strong style="color: var(--text-primary); font-size: 15px;" th:text="${#temporals.format(departureDate, 'dd/MM/yyyy')}">28/10/2026</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROUND-TRIP DUAL SUMMARY CARD -->
+            <div class="card" style="border-radius: var(--radius-lg); border-top: 4px solid var(--train-accent); margin-bottom: 24px; padding: 20px; background: #ffffff; box-shadow: var(--shadow-sm);" 
+                 th:if="${train != null and isRoundTrip}">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px dashed var(--border-subtle); padding-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="badge badge-warning" style="font-size: 13px; font-weight: 700;">Vé Tàu Khứ Hồi (2 Chiều)</span>
+                        <span style="font-size: 13px; color: var(--text-muted);">Cùng 1 mã đặt chỗ, tự động giữ chỗ cả chiều đi và chiều về</span>
+                    </div>
+                    <span class="badge badge-neutral" th:text="${#lists.size(bookingRequest.passengers) + ' hành khách'}">1 hành khách</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                    <!-- CHIỀU ĐI -->
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 14px 18px;">
+                        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #b45309; margin-bottom: 4px;">
+                            🚆 Chặng 1: Chiều Đi
+                        </div>
+                        <div style="font-size: 18px; font-weight: 800; color: #b45309;" th:text="'Tàu ' + ${train.trainCode} + ' (' + ${train.routeName} + ')'">Tàu SE1</div>
+                        <div style="font-size: 13.5px; margin: 6px 0; color: var(--text-primary);">
+                            <strong th:text="${depStation.stationName}">Ga Hà Nội</strong> &rarr;
+                            <strong th:text="${arrStation.stationName}">Ga Sài Gòn</strong>
+                        </div>
+                        <div style="font-size: 12.5px; color: var(--text-secondary);">
+                            Ngày đi: <strong th:text="${#temporals.format(departureDate, 'dd/MM/yyyy')}">28/10/2026</strong> &bull;
+                            Cự ly: <strong th:text="${distanceKm + ' km'}">1.726 km</strong>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                            Chỗ đã chọn: 
+                            <span th:each="s : ${seats}" class="badge badge-warning" style="margin-left: 4px; font-size: 11px;" 
+                                  th:text="${s.coach.coachName + ' - ' + s.seatLabel}">Toa 1 - Ghế 01</span>
+                        </div>
+                    </div>
+
+                    <!-- CHIỀU VỀ -->
+                    <div th:if="${returnTrain != null}" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 14px 18px;">
+                        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #15803d; margin-bottom: 4px;">
+                            🚆 Chặng 2: Chiều Về
+                        </div>
+                        <div style="font-size: 18px; font-weight: 800; color: #15803d;" th:text="'Tàu ' + ${returnTrain.trainCode} + ' (' + ${returnTrain.routeName} + ')'">Tàu SE2</div>
+                        <div style="font-size: 13.5px; margin: 6px 0; color: var(--text-primary);">
+                            <strong th:text="${arrStation.stationName}">Ga Sài Gòn</strong> &rarr;
+                            <strong th:text="${depStation.stationName}">Ga Hà Nội</strong>
+                        </div>
+                        <div style="font-size: 12.5px; color: var(--text-secondary);">
+                            Ngày về: <strong th:text="${returnDepartureDate != null ? #temporals.format(returnDepartureDate, 'dd/MM/yyyy') : ''}">31/10/2026</strong> &bull;
+                            Cự ly: <strong th:text="${distanceKm + ' km'}">1.726 km</strong>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                            Chỗ đã chọn: 
+                            <span th:each="rs : ${returnSeats}" class="badge badge-success" style="margin-left: 4px; font-size: 11px;" 
+                                  th:text="${rs.coach.coachName + ' - ' + rs.seatLabel}">Toa 1 - Ghế 01</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERROR ALERT -->
+            <div th:if="${errorMessage != null}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <!-- PRIORITY DISCOUNT RULES -->
+            <div class="alert alert-warning" style="margin-bottom: 24px;">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                <div style="font-size: 13px;">
+                    <strong>Chính sách ưu đãi &amp; Giữ chỗ vé tàu:</strong>
+                    <ul style="margin: 6px 0 0 16px; padding: 0; line-height: 1.6;">
+                        <li><strong>Ưu đãi đối tượng:</strong> Giảm 10% cho sinh viên (nhập Mã SV); Giảm 15% cho người cao tuổi (&ge;60 tuổi); Giảm 25% cho trẻ em (6-10 tuổi).</li>
+                        <li th:if="${isRoundTrip}"><strong>Ưu đãi khứ hồi:</strong> Giảm giá đối tượng được tự động áp dụng trên <strong>cả vé chiều đi và vé chiều về</strong>.</li>
+                        <li><strong>Hiệu lực giữ chỗ:</strong> Đơn giữ chỗ có hiệu lực trong <strong>10 phút</strong>. Vui lòng hoàn tất thanh toán trước khi thời gian kết thúc.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <form method="post" th:action="@{/trains/hold}" th:object="${bookingRequest}" data-protect>
+                <input type="hidden" th:field="*{trainId}" />
+                <input type="hidden" th:field="*{departureStationId}" />
+                <input type="hidden" th:field="*{arrivalStationId}" />
+                <input type="hidden" th:field="*{departureDate}" />
+                <input type="hidden" th:field="*{roundTrip}" />
+                <input type="hidden" th:field="*{returnTrainId}" th:if="${returnTrain != null}" />
+                <input type="hidden" th:field="*{returnDate}" th:if="${returnDepartureDate != null}" />
+
+                <!-- SECTION 1: CONTACT INFO -->
+                <div class="card" style="margin-bottom: 24px; border-radius: var(--radius-lg);">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            1. Thông Tin Người Đặt Vé &amp; Nhận Vé
+                        </div>
+                    </div>
+                    <div th:if="${isMember}" class="alert alert-success" style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: 13px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; border-radius: var(--radius-md);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <strong>Ưu đãi thành viên:</strong> Đã tự động lưu &amp; điền sẵn Họ tên, Số điện thoại và Email từ tài khoản thành viên để bạn không phải nhập lại!
+                        </div>
+                    </div>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Họ tên người liên hệ <span class="required">*</span></label>
+                            <input type="text" th:field="*{customerName}" class="form-control" placeholder="Nguyễn Văn A" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại <span class="required">*</span></label>
+                            <input type="tel" th:field="*{customerPhone}" class="form-control" placeholder="0912345678" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email nhận vé (Gmail) <span class="required">*</span></label>
+                            <input type="email" th:field="*{customerEmail}" class="form-control" placeholder="nguyenvana@gmail.com" required />
+                            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Mã đặt chỗ và vé tàu điện tử sẽ được chuyển tự động về Gmail này.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PASSENGERS -->
+                <div class="card" style="margin-bottom: 24px; border-radius: var(--radius-lg);">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            2. Danh Sách Hành Khách Đi Tàu &amp; Đối Tượng Ưu Tiên
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div th:each="p, pStat : *{passengers}" style="background: var(--surface-alt); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                            <input type="hidden" th:field="*{passengers[__${pStat.index}__].seatId}" />
+                            <input type="hidden" th:field="*{passengers[__${pStat.index}__].returnSeatId}" th:if="${isRoundTrip}" />
+                            
+                            <div style="font-weight: 700; color: var(--train-accent); font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="badge badge-warning" th:text="'Khách #' + ${pStat.count}">Khách #1</span>
+                                    
+                                    <!-- ONE-WAY SEAT LABEL -->
+                                    <span th:if="${!isRoundTrip}" style="font-size: 13px; color: var(--text-primary);" 
+                                          th:text="'Chỗ: ' + (${seats != null and #lists.size(seats) > pStat.index} ? ${seats[pStat.index].coach.coachName + ' - ' + seats[pStat.index].seatLabel} : 'Chỗ số ' + *{passengers[__${pStat.index}__].seatId})">
+                                    </span>
+
+                                    <!-- ROUND-TRIP SEATS LABELS -->
+                                    <span th:if="${isRoundTrip}" style="display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px;">
+                                        <span class="badge badge-warning" 
+                                              th:text="'Chiều đi: ' + (${seats != null and #lists.size(seats) > pStat.index} ? ${seats[pStat.index].coach.coachName + ' - ' + seats[pStat.index].seatLabel} : 'Chỗ đi')"></span>
+                                        <span class="badge badge-success" 
+                                              th:text="'Chiều về: ' + (${returnSeats != null and #lists.size(returnSeats) > pStat.index} ? ${returnSeats[pStat.index].coach.coachName + ' - ' + returnSeats[pStat.index].seatLabel} : 'Chỗ về')"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                                <div>
+                                    <label class="form-label">Họ và tên hành khách <span class="required">*</span></label>
+                                    <input type="text" th:field="*{passengers[__${pStat.index}__].passengerName}" class="form-control" placeholder="TRẦN VĂN AN" required />
+                                </div>
+                                <div>
+                                    <label class="form-label">Số CCCD / Định danh</label>
+                                    <input type="text" th:field="*{passengers[__${pStat.index}__].passengerIdCard}" class="form-control" placeholder="001200001234" />
+                                </div>
+                                <div>
+                                    <label class="form-label">Đối tượng ưu tiên <span class="required">*</span></label>
+                                    <select th:field="*{passengers[__${pStat.index}__].priorityCategory}" class="form-select">
+                                        <option th:each="pr : ${priorities}" th:value="${pr}" th:text="${pr.displayName}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Mã giấy tờ ưu tiên (nếu có)</label>
+                                    <input type="text" th:field="*{passengers[__${pStat.index}__].priorityDocId}" class="form-control" placeholder="Mã SV / CCCD / GKS" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button type="submit" class="btn btn-cta btn-lg" style="padding: 14px 36px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span th:text="${isRoundTrip ? 'Tiến Hành Giữ Chỗ Vé Tàu Khứ Hồi (10 Phút) &rarr;' : 'Tiến Hành Giữ Chỗ Vé Tàu (10 Phút) &rarr;'}">Tiến Hành Giữ Chỗ Vé Tàu (10 Phút) &rarr;</span>
+                    </button>
+                    <div style="margin-top: 14px;">
+                        <a href="/trains" style="color: var(--text-muted); font-size: 13px;">&larr; Hủy thao tác, quay lại tìm kiếm</a>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

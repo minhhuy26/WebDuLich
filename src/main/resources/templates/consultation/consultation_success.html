@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tư Vấn Thành Công - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 0; background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);">
+
+<div class="app-container-sm" style="max-width: 580px;">
+
+    <div class="card" style="box-shadow: var(--shadow-xl); border-radius: var(--radius-xl); border-top: 5px solid var(--success); text-align: center; padding: 36px 32px;">
+        
+        <div style="width: 64px; height: 64px; background: var(--success-bg); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+
+        <h1 style="font-size: 24px; font-weight: 800; color: var(--success-text); margin-bottom: 8px;">Đăng Ký Tư Vấn Thành Công!</h1>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">Cảm ơn quý khách. Yêu cầu của bạn đã được tiếp nhận và chuyên viên sẽ chủ động gọi điện theo lịch hẹn.</p>
+
+        <div style="background: var(--surface-alt); border: 2px dashed var(--primary-light); padding: 18px; border-radius: var(--radius-md); margin-bottom: 24px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Mã Lịch Hẹn Tư Vấn</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: 2px; font-family: var(--font-mono);" th:text="${consultation.consultationCode}">CS-123456</div>
+        </div>
+
+        <div class="table-responsive" style="margin-bottom: 28px; border-radius: var(--radius-md);">
+            <table class="table-custom" style="text-align: left;">
+                <tbody>
+                    <tr>
+                        <td style="color: var(--text-muted); width: 45%; font-weight: 600;">Họ tên khách hàng:</td>
+                        <td><strong th:text="${consultation.customerName}">Nguyễn Văn An</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">Số điện thoại:</td>
+                        <td><strong style="color: var(--primary);" th:text="${consultation.phone}">0912345678</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">Email:</td>
+                        <td th:text="${consultation.email ?: 'Không cung cấp'}">an@example.com</td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">Loại vé quan tâm:</td>
+                        <td>
+                            <span th:if="${consultation.ticketType.name() == 'FLIGHT'}" class="badge badge-primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-2px;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg> Vé Máy Bay</span>
+                            <span th:if="${consultation.ticketType.name() == 'TRAIN'}" class="badge badge-warning"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-2px;"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/></svg> Vé Tàu Hỏa</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">Thời gian hẹn:</td>
+                        <td><strong th:text="${#temporals.format(consultation.preferredDate, 'HH:mm - dd/MM/yyyy')}">09:00 - 28/10/2026</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">Trạng thái:</td>
+                        <td><span class="badge badge-warning">⏳ Chờ chuyên viên tiếp nhận</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="/" class="btn btn-secondary">&larr; Về Trang Chủ</a>
+            <a href="/consultations/new" class="btn btn-cta">+ Đăng Ký Lịch Khác</a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

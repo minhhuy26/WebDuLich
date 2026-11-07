@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Kiếm Chuyến Bay - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('flights')}"></header>
+
+    <main class="main-content" style="padding-top: 30px;">
+        <div class="app-container">
+
+            <!-- SEARCH HERO BOX -->
+            <div class="card" style="box-shadow: var(--shadow-md); border-radius: var(--radius-xl); border: 1px solid var(--border-subtle); margin-bottom: 30px; padding: 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h1 style="font-size: 22px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; margin: 0;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                            Tìm Kiếm Chuyến Bay Nội Địa
+                        </h1>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">Cập nhật lịch bay và mức giá tốt nhất từ các hãng hàng không hàng đầu</p>
+                    </div>
+                    <span class="badge badge-primary">Vé điện tử chính hãng</span>
+                </div>
+
+                <!-- SEARCH FORM -->
+                <form method="get" action="/flights" id="flightSearchFilterForm">
+                    <!-- LOẠI CHUYẾN BAY: MỘT CHIỀU / KHỨ HỒI -->
+                    <div style="display: flex; gap: 24px; align-items: center; margin-bottom: 16px; font-size: 14px; font-weight: 700;">
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="false" th:checked="${!searchDto.roundTrip}" id="flightListOneWayRadio" style="width: 16px; height: 16px; accent-color: var(--primary);" onchange="toggleFlightListReturnDate(false)" />
+                            <span>Một chiều</span>
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="true" th:checked="${searchDto.roundTrip}" id="flightListRoundTripRadio" style="width: 16px; height: 16px; accent-color: var(--primary);" onchange="toggleFlightListReturnDate(true)" />
+                            <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                <span>Khứ hồi (2 chiều)</span>
+                                <span class="badge badge-success" style="font-size: 12px; padding: 3px 8px;">Tiện lợi</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                Sân bay / Điểm đi
+                            </label>
+                            <select name="departureAirport" id="departureAirportSelect" class="form-select">
+                                <option value="" th:selected="${searchDto.departureAirport == null or searchDto.departureAirport == ''}">-- Tất Cả Điểm Đi --</option>
+                                <optgroup label="Miền Bắc">
+                                    <option value="HAN" th:selected="${searchDto.departureAirport == 'HAN' or searchDto.departureAirport == 'Hà Nội'}">Hà Nội (HAN) - Sân bay Nội Bài</option>
+                                    <option value="HPH" th:selected="${searchDto.departureAirport == 'HPH' or searchDto.departureAirport == 'Hải Phòng'}">Hải Phòng (HPH) - Sân bay Cát Bi</option>
+                                    <option value="VDO" th:selected="${searchDto.departureAirport == 'VDO' or searchDto.departureAirport == 'Quảng Ninh'}">Quảng Ninh (VDO) - Sân bay Vân Đồn</option>
+                                    <option value="DIN" th:selected="${searchDto.departureAirport == 'DIN' or searchDto.departureAirport == 'Điện Biên'}">Điện Biên (DIN) - Sân bay Điện Biên Phủ</option>
+                                </optgroup>
+                                <optgroup label="Miền Trung &amp; Tây Nguyên">
+                                    <option value="DAD" th:selected="${searchDto.departureAirport == 'DAD' or searchDto.departureAirport == 'Đà Nẵng'}">Đà Nẵng (DAD) - Sân bay Quốc tế Đà Nẵng</option>
+                                    <option value="CXR" th:selected="${searchDto.departureAirport == 'CXR' or searchDto.departureAirport == 'Nha Trang'}">Nha Trang / Cam Ranh (CXR) - Sân bay Cam Ranh</option>
+                                    <option value="DLI" th:selected="${searchDto.departureAirport == 'DLI' or searchDto.departureAirport == 'Đà Lạt'}">Đà Lạt (DLI) - Sân bay Liên Khương</option>
+                                    <option value="HUI" th:selected="${searchDto.departureAirport == 'HUI' or searchDto.departureAirport == 'Huế'}">Huế (HUI) - Sân bay Phú Bài</option>
+                                    <option value="VII" th:selected="${searchDto.departureAirport == 'VII' or searchDto.departureAirport == 'Vinh'}">Vinh (VII) - Sân bay Quốc tế Vinh</option>
+                                    <option value="UIH" th:selected="${searchDto.departureAirport == 'UIH' or searchDto.departureAirport == 'Quy Nhơn'}">Quy Nhơn (UIH) - Sân bay Phù Cát</option>
+                                    <option value="VDH" th:selected="${searchDto.departureAirport == 'VDH' or searchDto.departureAirport == 'Đồng Hới'}">Đồng Hới (VDH) - Sân bay Đồng Hới</option>
+                                    <option value="THD" th:selected="${searchDto.departureAirport == 'THD' or searchDto.departureAirport == 'Thanh Hóa'}">Thanh Hóa (THD) - Sân bay Thọ Xuân</option>
+                                    <option value="TBB" th:selected="${searchDto.departureAirport == 'TBB' or searchDto.departureAirport == 'Tuy Hòa'}">Tuy Hòa (TBB) - Sân bay Tuy Hòa</option>
+                                    <option value="BMV" th:selected="${searchDto.departureAirport == 'BMV' or searchDto.departureAirport == 'Buôn Ma Thuột'}">Buôn Ma Thuột (BMV) - Sân bay Buôn Ma Thuột</option>
+                                    <option value="PXU" th:selected="${searchDto.departureAirport == 'PXU' or searchDto.departureAirport == 'Pleiku'}">Pleiku (PXU) - Sân bay Pleiku</option>
+                                </optgroup>
+                                <optgroup label="Miền Nam">
+                                    <option value="SGN" th:selected="${searchDto.departureAirport == 'SGN' or searchDto.departureAirport == 'TP. Hồ Chí Minh' or searchDto.departureAirport == 'Sài Gòn'}">TP. Hồ Chí Minh (SGN) - Sân bay Tân Sơn Nhất</option>
+                                    <option value="PQC" th:selected="${searchDto.departureAirport == 'PQC' or searchDto.departureAirport == 'Phú Quốc'}">Phú Quốc (PQC) - Sân bay Quốc tế Phú Quốc</option>
+                                    <option value="VCA" th:selected="${searchDto.departureAirport == 'VCA' or searchDto.departureAirport == 'Cần Thơ'}">Cần Thơ (VCA) - Sân bay Cần Thơ</option>
+                                    <option value="VCS" th:selected="${searchDto.departureAirport == 'VCS' or searchDto.departureAirport == 'Côn Đảo'}">Côn Đảo (VCS) - Sân bay Côn Đảo</option>
+                                    <option value="VKG" th:selected="${searchDto.departureAirport == 'VKG' or searchDto.departureAirport == 'Rạch Giá'}">Rạch Giá (VKG) - Sân bay Rạch Giá</option>
+                                    <option value="CAH" th:selected="${searchDto.departureAirport == 'CAH' or searchDto.departureAirport == 'Cà Mau'}">Cà Mau (CAH) - Sân bay Cà Mau</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M20 12l-4-4"/><path d="M20 12l-4 4"/></svg>
+                                Sân bay / Điểm đến
+                            </label>
+                            <select name="arrivalAirport" id="arrivalAirportSelect" class="form-select">
+                                <option value="" th:selected="${searchDto.arrivalAirport == null or searchDto.arrivalAirport == ''}">-- Tất Cả Điểm Đến --</option>
+                                <optgroup label="Miền Nam">
+                                    <option value="SGN" th:selected="${searchDto.arrivalAirport == 'SGN' or searchDto.arrivalAirport == 'TP. Hồ Chí Minh' or searchDto.arrivalAirport == 'Sài Gòn'}">TP. Hồ Chí Minh (SGN) - Sân bay Tân Sơn Nhất</option>
+                                    <option value="PQC" th:selected="${searchDto.arrivalAirport == 'PQC' or searchDto.arrivalAirport == 'Phú Quốc'}">Phú Quốc (PQC) - Sân bay Quốc tế Phú Quốc</option>
+                                    <option value="VCA" th:selected="${searchDto.arrivalAirport == 'VCA' or searchDto.arrivalAirport == 'Cần Thơ'}">Cần Thơ (VCA) - Sân bay Cần Thơ</option>
+                                    <option value="VCS" th:selected="${searchDto.arrivalAirport == 'VCS' or searchDto.arrivalAirport == 'Côn Đảo'}">Côn Đảo (VCS) - Sân bay Côn Đảo</option>
+                                    <option value="VKG" th:selected="${searchDto.arrivalAirport == 'VKG' or searchDto.arrivalAirport == 'Rạch Giá'}">Rạch Giá (VKG) - Sân bay Rạch Giá</option>
+                                    <option value="CAH" th:selected="${searchDto.arrivalAirport == 'CAH' or searchDto.arrivalAirport == 'Cà Mau'}">Cà Mau (CAH) - Sân bay Cà Mau</option>
+                                </optgroup>
+                                <optgroup label="Miền Trung &amp; Tây Nguyên">
+                                    <option value="DAD" th:selected="${searchDto.arrivalAirport == 'DAD' or searchDto.arrivalAirport == 'Đà Nẵng'}">Đà Nẵng (DAD) - Sân bay Quốc tế Đà Nẵng</option>
+                                    <option value="CXR" th:selected="${searchDto.arrivalAirport == 'CXR' or searchDto.arrivalAirport == 'Nha Trang'}">Nha Trang / Cam Ranh (CXR) - Sân bay Cam Ranh</option>
+                                    <option value="DLI" th:selected="${searchDto.arrivalAirport == 'DLI' or searchDto.arrivalAirport == 'Đà Lạt'}">Đà Lạt (DLI) - Sân bay Liên Khương</option>
+                                    <option value="HUI" th:selected="${searchDto.arrivalAirport == 'HUI' or searchDto.arrivalAirport == 'Huế'}">Huế (HUI) - Sân bay Phú Bài</option>
+                                    <option value="VII" th:selected="${searchDto.arrivalAirport == 'VII' or searchDto.arrivalAirport == 'Vinh'}">Vinh (VII) - Sân bay Quốc tế Vinh</option>
+                                    <option value="UIH" th:selected="${searchDto.arrivalAirport == 'UIH' or searchDto.arrivalAirport == 'Quy Nhơn'}">Quy Nhơn (UIH) - Sân bay Phù Cát</option>
+                                    <option value="VDH" th:selected="${searchDto.arrivalAirport == 'VDH' or searchDto.arrivalAirport == 'Đồng Hới'}">Đồng Hới (VDH) - Sân bay Đồng Hới</option>
+                                    <option value="THD" th:selected="${searchDto.arrivalAirport == 'THD' or searchDto.arrivalAirport == 'Thanh Hóa'}">Thanh Hóa (THD) - Sân bay Thọ Xuân</option>
+                                    <option value="TBB" th:selected="${searchDto.arrivalAirport == 'TBB' or searchDto.arrivalAirport == 'Tuy Hòa'}">Tuy Hòa (TBB) - Sân bay Tuy Hòa</option>
+                                    <option value="BMV" th:selected="${searchDto.arrivalAirport == 'BMV' or searchDto.arrivalAirport == 'Buôn Ma Thuột'}">Buôn Ma Thuột (BMV) - Sân bay Buôn Ma Thuột</option>
+                                    <option value="PXU" th:selected="${searchDto.arrivalAirport == 'PXU' or searchDto.arrivalAirport == 'Pleiku'}">Pleiku (PXU) - Sân bay Pleiku</option>
+                                </optgroup>
+                                <optgroup label="Miền Bắc">
+                                    <option value="HAN" th:selected="${searchDto.arrivalAirport == 'HAN' or searchDto.arrivalAirport == 'Hà Nội'}">Hà Nội (HAN) - Sân bay Nội Bài</option>
+                                    <option value="HPH" th:selected="${searchDto.arrivalAirport == 'HPH' or searchDto.arrivalAirport == 'Hải Phòng'}">Hải Phòng (HPH) - Sân bay Cát Bi</option>
+                                    <option value="VDO" th:selected="${searchDto.arrivalAirport == 'VDO' or searchDto.arrivalAirport == 'Quảng Ninh'}">Quảng Ninh (VDO) - Sân bay Vân Đồn</option>
+                                    <option value="DIN" th:selected="${searchDto.arrivalAirport == 'DIN' or searchDto.arrivalAirport == 'Điện Biên'}">Điện Biên (DIN) - Sân bay Điện Biên Phủ</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Ngày khởi hành</label>
+                            <input type="date" name="departureDate" th:value="${searchDto.departureDate}" class="form-control" />
+                        </div>
+                        <div id="flightListReturnDateGroup" th:style="${searchDto.roundTrip ? 'display: block;' : 'display: none;'}">
+                            <label class="form-label" style="color: var(--primary); font-weight: 700;">Ngày về (Khứ hồi)</label>
+                            <input type="date" name="returnDate" id="flightListReturnDateInput" th:value="${searchDto.returnDate}" class="form-control" style="border-color: var(--primary);" />
+                        </div>
+                        <div>
+                            <label class="form-label">Hạng ghế</label>
+                            <select name="seatClass" id="flightSearchSeatClass" class="form-select">
+                                <option th:each="c : ${seatClasses}" th:value="${c}" th:text="${c.displayName}"
+                                        th:selected="${c == searchDto.seatClass}"></option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Số khách</label>
+                            <select name="passengerCount" id="flightSearchPassengerCount" class="form-select">
+                                <option th:each="i : ${#numbers.sequence(1, 9)}" th:value="${i}" th:text="${i + ' hành khách'}"
+                                        th:selected="${i == searchDto.passengerCount}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-cta">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                            Tìm Kiếm Chuyến Bay
+                        </button>
+                        <button type="button" id="swapAirportsBtn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-full);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m7 16 5 5 5-5"/><path d="M12 21V3"/><path d="m17 8-5-5-5 5"/></svg>
+                            <span>Đảo Chiều Bay</span>
+                        </button>
+                        <a href="/flights" class="btn btn-secondary btn-sm">Xem tất cả lịch bay</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TRƯỜNG HỢP 1: TÌM KIẾM MỘT CHIỀU (!searchDto.roundTrip) -->
+            <!-- ============================================================ -->
+            <div th:if="${!searchDto.roundTrip}">
+                <!-- RESULTS LIST -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <h2 style="font-size: 19px; font-weight: 700; color: var(--text-primary); margin: 0;">
+                        Danh Sách Chuyến Bay Sẵn Sàng (Một Chiều)
+                    </h2>
+                    <span class="badge badge-neutral" th:text="${#lists.size(flights)} + ' chuyến bay'"></span>
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div th:if="${#lists.isEmpty(flights)}" class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+                    </div>
+                    <div class="empty-title">Không tìm thấy chuyến bay phù hợp</div>
+                    <p class="empty-desc">Không có chuyến bay nào khớp với hành trình hoặc ngày bạn chọn. Vui lòng thử tìm ngày khác.</p>
+                    <a href="/flights" class="btn btn-primary btn-sm">Xem toàn bộ lịch bay</a>
+                </div>
+
+            <!-- FLIGHT CARDS -->
+            <div th:if="${not #lists.isEmpty(flights)}" style="display: flex; flex-direction: column; gap: 16px;">
+                <div th:each="f : ${flights}" class="card card-hover" style="border-radius: var(--radius-lg); padding: 20px 24px;">
+                    <div style="display: grid; grid-template-columns: 2fr 3fr 1.5fr 1.5fr; gap: 20px; align-items: center;" class="flight-grid-row">
+                        
+                        <!-- AIRLINE & CODE -->
+                        <div style="display: flex; align-items: flex-start; gap: 14px;">
+                            <div style="flex-shrink: 0; width: 68px; height: 48px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid var(--border-subtle); box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                                <img th:if="${#strings.containsIgnoreCase(f.airline, 'Vietnam')}" src="/images/airlines/vietnam-airlines.svg" th:src="@{/images/airlines/vietnam-airlines.svg}" alt="Vietnam Airlines" style="width: 100%; height: 100%; object-fit: cover;" />
+                                <img th:if="${#strings.containsIgnoreCase(f.airline, 'Vietjet')}" src="/images/airlines/vietjet.svg" th:src="@{/images/airlines/vietjet.svg}" alt="Vietjet Air" style="width: 100%; height: 100%; object-fit: cover;" />
+                                <img th:if="${#strings.containsIgnoreCase(f.airline, 'Bamboo')}" src="/images/airlines/bamboo-airways.svg" th:src="@{/images/airlines/bamboo-airways.svg}" alt="Bamboo Airways" style="width: 100%; height: 100%; object-fit: cover;" />
+                            </div>
+                            <div>
+                                <div style="font-size: 18px; font-weight: 800; color: var(--primary);" th:text="${f.flightNumber}">VN215</div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${f.airline}">Vietnam Airlines</div>
+                                <div style="margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;">
+                                    <span class="badge badge-info" th:text="'Eco: ' + ${f.economySeatsAvailable}"></span>
+                                    <span class="badge badge-info" th:text="'Prem: ' + ${f.premiumSeatsAvailable}"></span>
+                                    <span class="badge badge-info" th:text="'Biz: ' + ${f.businessSeatsAvailable}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROUTE & TIMING -->
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(f.departureTime, 'HH:mm')}">08:00</div>
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${f.departureCity}">Hà Nội</div>
+                                    <small style="color: var(--text-muted);" th:text="${f.departureAirport}">HAN</small>
+                                </div>
+
+                                <div style="flex: 1; text-align: center; position: relative;">
+                                    <small style="font-size: 11px; color: var(--text-muted); display: block;">Bay thẳng</small>
+                                    <div class="route-line" style="margin: 6px 0;"></div>
+                                    <small style="font-size: 11px; color: var(--text-muted);" th:text="${#temporals.format(f.departureTime, 'dd/MM/yyyy')}">29/10/2026</small>
+                                </div>
+
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(f.arrivalTime, 'HH:mm')}">10:15</div>
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${f.arrivalCity}">TP. Hồ Chí Minh</div>
+                                    <small style="color: var(--text-muted);" th:text="${f.arrivalAirport}">SGN</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PRICE -->
+                        <div style="text-align: right;">
+                            <small style="font-size: 12px; color: var(--text-muted); display: block;">Giá vé cơ bản từ</small>
+                            <div style="font-size: 22px; font-weight: 800; color: var(--accent);" th:text="${#numbers.formatDecimal(f.basePrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,400,000 đ</div>
+                            <small style="font-size: 11px; color: var(--text-muted);">/ khách</small>
+                        </div>
+
+                        <!-- ACTION -->
+                        <div style="text-align: right;">
+                            <a th:href="@{'/flights/' + ${f.id} + '/book' + '?seatClass=' + ${searchDto.seatClass} + '&passengerCount=' + ${searchDto.passengerCount}}" 
+                               class="btn btn-cta btn-block">
+                                Chọn Vé &rarr;
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TRƯỜNG HỢP 2: TÌM KIẾM KHỨ HỒI (searchDto.roundTrip == true) -->
+            <!-- ============================================================ -->
+            <div th:if="${searchDto.roundTrip}">
+                
+                <!-- BƯỚC 1: CHỌN CHIỀU ĐI -->
+                <div style="margin-bottom: 36px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge badge-primary">Bước 1 / 2</span>
+                                <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                                    🛫 Chọn Chuyến Bay Chiều Đi
+                                </h2>
+                            </div>
+                            <small style="color: var(--text-secondary);" th:text="${searchDto.departureAirport != null ? searchDto.departureAirport : 'Điểm đi'} + ' &rarr; ' + ${searchDto.arrivalAirport != null ? searchDto.arrivalAirport : 'Điểm đến'}"></small>
+                        </div>
+                        <span class="badge badge-neutral" th:text="${#lists.size(flights)} + ' chuyến bay'"></span>
+                    </div>
+
+                    <!-- EMPTY OUTBOUND -->
+                    <div th:if="${#lists.isEmpty(flights)}" class="empty-state" style="padding: 24px;">
+                        <div class="empty-title">Không tìm thấy chuyến bay chiều đi phù hợp</div>
+                        <p class="empty-desc">Vui lòng điều chỉnh ngày bay hoặc điểm đến.</p>
+                    </div>
+
+                    <!-- OUTBOUND FLIGHT LIST -->
+                    <div th:if="${not #lists.isEmpty(flights)}" style="display: flex; flex-direction: column; gap: 14px;">
+                        <div th:each="f, fStat : ${flights}" 
+                             class="card card-hover roundtrip-card outbound-card"
+                             th:id="'outbound-card-' + ${f.id}"
+                             th:data-id="${f.id}"
+                             th:data-flight="${f.flightNumber}"
+                             th:data-airline="${f.airline}"
+                             th:data-price="${f.basePrice}"
+                             th:data-time="${#temporals.format(f.departureTime, 'HH:mm dd/MM')}"
+                             style="border-radius: var(--radius-lg); padding: 18px 22px; cursor: pointer; transition: all 0.2s;"
+                             onclick="selectOutboundFlight(this)">
+                            <div style="display: grid; grid-template-columns: 40px 2fr 3fr 1.5fr; gap: 16px; align-items: center;" class="flight-grid-row">
+                                
+                                <!-- RADIO SELECTOR -->
+                                <div>
+                                    <input type="radio" name="roundTripOutboundRadio" th:value="${f.id}" th:id="'radio-out-' + ${f.id}" th:checked="${fStat.first}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary);" />
+                                </div>
+
+                                <!-- AIRLINE & CODE -->
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="flex-shrink: 0; width: 56px; height: 40px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid var(--border-subtle);">
+                                        <img th:if="${#strings.containsIgnoreCase(f.airline, 'Vietnam')}" src="/images/airlines/vietnam-airlines.svg" th:src="@{/images/airlines/vietnam-airlines.svg}" alt="Vietnam Airlines" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <img th:if="${#strings.containsIgnoreCase(f.airline, 'Vietjet')}" src="/images/airlines/vietjet.svg" th:src="@{/images/airlines/vietjet.svg}" alt="Vietjet Air" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <img th:if="${#strings.containsIgnoreCase(f.airline, 'Bamboo')}" src="/images/airlines/bamboo-airways.svg" th:src="@{/images/airlines/bamboo-airways.svg}" alt="Bamboo Airways" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 17px; font-weight: 800; color: var(--primary);" th:text="${f.flightNumber}">VN215</div>
+                                        <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${f.airline}">Vietnam Airlines</div>
+                                    </div>
+                                </div>
+
+                                <!-- ROUTE & TIMING -->
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 14px;">
+                                        <div>
+                                            <div style="font-size: 17px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(f.departureTime, 'HH:mm')}">08:00</div>
+                                            <small style="color: var(--text-secondary); font-weight: 600;" th:text="${f.departureCity}">Hà Nội</small>
+                                        </div>
+
+                                        <div style="flex: 1; text-align: center; position: relative;">
+                                            <small style="font-size: 11px; color: var(--text-muted); display: block;" th:text="${#temporals.format(f.departureTime, 'dd/MM/yyyy')}">29/10/2026</small>
+                                            <div class="route-line" style="margin: 4px 0;"></div>
+                                            <small style="font-size: 10px; color: var(--text-muted);">Bay thẳng</small>
+                                        </div>
+
+                                        <div>
+                                            <div style="font-size: 17px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(f.arrivalTime, 'HH:mm')}">10:15</div>
+                                            <small style="color: var(--text-secondary); font-weight: 600;" th:text="${f.arrivalCity}">TP.HCM</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PRICE -->
+                                <div style="text-align: right;">
+                                    <small style="font-size: 11px; color: var(--text-muted); display: block;">Giá vé cơ bản</small>
+                                    <div style="font-size: 19px; font-weight: 800; color: var(--accent);" th:text="${#numbers.formatDecimal(f.basePrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,400,000 đ</div>
+                                    <span class="badge badge-info" style="font-size: 11px; margin-top: 2px;" th:text="'Còn ' + ${f.economySeatsAvailable} + ' chỗ'"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 2: CHỌN CHIỀU VỀ -->
+                <div style="margin-bottom: 40px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge badge-accent">Bước 2 / 2</span>
+                                <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                                    🛬 Chọn Chuyến Bay Chiều Về
+                                </h2>
+                            </div>
+                            <small style="color: var(--text-secondary);" th:text="${searchDto.arrivalAirport != null ? searchDto.arrivalAirport : 'Điểm đến'} + ' &rarr; ' + ${searchDto.departureAirport != null ? searchDto.departureAirport : 'Điểm đi'}"></small>
+                        </div>
+                        <span class="badge badge-neutral" th:text="${#lists.size(returnFlights)} + ' chuyến bay'"></span>
+                    </div>
+
+                    <!-- EMPTY RETURN -->
+                    <div th:if="${#lists.isEmpty(returnFlights)}" class="empty-state" style="padding: 24px;">
+                        <div class="empty-title">Không tìm thấy chuyến bay chiều về phù hợp</div>
+                        <p class="empty-desc">Không có chuyến bay chiều về nào khớp với ngày bạn chọn. Vui lòng chọn ngày về khác trên form tìm kiếm phía trên.</p>
+                    </div>
+
+                    <!-- RETURN FLIGHT LIST -->
+                    <div th:if="${not #lists.isEmpty(returnFlights)}" style="display: flex; flex-direction: column; gap: 14px;">
+                        <div th:each="rf, rfStat : ${returnFlights}" 
+                             class="card card-hover roundtrip-card return-card"
+                             th:id="'return-card-' + ${rf.id}"
+                             th:data-id="${rf.id}"
+                             th:data-flight="${rf.flightNumber}"
+                             th:data-airline="${rf.airline}"
+                             th:data-price="${rf.basePrice}"
+                             th:data-time="${#temporals.format(rf.departureTime, 'HH:mm dd/MM')}"
+                             style="border-radius: var(--radius-lg); padding: 18px 22px; cursor: pointer; transition: all 0.2s;"
+                             onclick="selectReturnFlight(this)">
+                            <div style="display: grid; grid-template-columns: 40px 2fr 3fr 1.5fr; gap: 16px; align-items: center;" class="flight-grid-row">
+                                
+                                <!-- RADIO SELECTOR -->
+                                <div>
+                                    <input type="radio" name="roundTripReturnRadio" th:value="${rf.id}" th:id="'radio-ret-' + ${rf.id}" th:checked="${rfStat.first}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent);" />
+                                </div>
+
+                                <!-- AIRLINE & CODE -->
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="flex-shrink: 0; width: 56px; height: 40px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid var(--border-subtle);">
+                                        <img th:if="${#strings.containsIgnoreCase(rf.airline, 'Vietnam')}" src="/images/airlines/vietnam-airlines.svg" th:src="@{/images/airlines/vietnam-airlines.svg}" alt="Vietnam Airlines" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <img th:if="${#strings.containsIgnoreCase(rf.airline, 'Vietjet')}" src="/images/airlines/vietjet.svg" th:src="@{/images/airlines/vietjet.svg}" alt="Vietjet Air" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <img th:if="${#strings.containsIgnoreCase(rf.airline, 'Bamboo')}" src="/images/airlines/bamboo-airways.svg" th:src="@{/images/airlines/bamboo-airways.svg}" alt="Bamboo Airways" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 17px; font-weight: 800; color: var(--accent);" th:text="${rf.flightNumber}">VN216</div>
+                                        <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${rf.airline}">Vietnam Airlines</div>
+                                    </div>
+                                </div>
+
+                                <!-- ROUTE & TIMING -->
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 14px;">
+                                        <div>
+                                            <div style="font-size: 17px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(rf.departureTime, 'HH:mm')}">08:30</div>
+                                            <small style="color: var(--text-secondary); font-weight: 600;" th:text="${rf.departureCity}">TP.HCM</small>
+                                        </div>
+
+                                        <div style="flex: 1; text-align: center; position: relative;">
+                                            <small style="font-size: 11px; color: var(--text-muted); display: block;" th:text="${#temporals.format(rf.departureTime, 'dd/MM/yyyy')}">04/11/2026</small>
+                                            <div class="route-line" style="margin: 4px 0;"></div>
+                                            <small style="font-size: 10px; color: var(--text-muted);">Bay thẳng</small>
+                                        </div>
+
+                                        <div>
+                                            <div style="font-size: 17px; font-weight: 700; color: var(--text-primary);" th:text="${#temporals.format(rf.arrivalTime, 'HH:mm')}">10:45</div>
+                                            <small style="color: var(--text-secondary); font-weight: 600;" th:text="${rf.arrivalCity}">Hà Nội</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PRICE -->
+                                <div style="text-align: right;">
+                                    <small style="font-size: 11px; color: var(--text-muted); display: block;">Giá vé cơ bản</small>
+                                    <div style="font-size: 19px; font-weight: 800; color: var(--accent);" th:text="${#numbers.formatDecimal(rf.basePrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,400,000 đ</div>
+                                    <span class="badge badge-info" style="font-size: 11px; margin-top: 2px;" th:text="'Còn ' + ${rf.economySeatsAvailable} + ' chỗ'"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STICKY SUMMARY BOTTOM BAR FOR ROUND TRIP BOOKING -->
+                <div id="roundTripStickyBar" style="position: sticky; bottom: 20px; z-index: 100; background: white; border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgba(0,0,0,0.18); border: 2px solid var(--primary); padding: 18px 24px; margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                                ✈️ Vé Khứ Hồi Đã Chọn
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-primary); display: flex; gap: 14px; flex-wrap: wrap;">
+                                <span>🛫 Đi: <strong id="lblOutboundFlight" style="color: var(--primary);">--</strong></span>
+                                <span style="color: var(--border-subtle);">|</span>
+                                <span>🛬 Về: <strong id="lblReturnFlight" style="color: var(--accent);">--</strong></span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <div style="text-align: right;">
+                                <small style="font-size: 11px; color: var(--text-muted); display: block;">Tổng tiền cơ bản (chưa thuế phí)</small>
+                                <div id="lblTotalPrice" style="font-size: 22px; font-weight: 800; color: var(--accent);">0 đ</div>
+                            </div>
+                            <button type="button" id="btnBookRoundTrip" class="btn btn-cta btn-lg" onclick="submitRoundTripBooking()" style="padding: 12px 28px;">
+                                Tiếp Tục Đặt Vé Khứ Hồi &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+    <script th:inline="javascript">
+        function toggleFlightListReturnDate(isRoundTrip) {
+            const grp = document.getElementById('flightListReturnDateGroup');
+            const inp = document.getElementById('flightListReturnDateInput');
+            if (grp) {
+                grp.style.display = isRoundTrip ? 'block' : 'none';
+                if (!isRoundTrip && inp) inp.value = '';
+            }
+        }
+
+        // Xử lý chọn chuyến bay khứ hồi (Round-Trip Interactive Selection)
+        function selectOutboundFlight(cardElement) {
+            const radio = cardElement.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                highlightSelectedCards();
+                updateRoundTripSummary();
+            }
+        }
+
+        function selectReturnFlight(cardElement) {
+            const radio = cardElement.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                highlightSelectedCards();
+                updateRoundTripSummary();
+            }
+        }
+
+        function highlightSelectedCards() {
+            document.querySelectorAll('.outbound-card').forEach(c => {
+                const r = c.querySelector('input[type="radio"]');
+                if (r && r.checked) {
+                    c.style.borderColor = 'var(--primary)';
+                    c.style.background = 'rgba(14, 165, 233, 0.05)';
+                    c.style.boxShadow = '0 0 0 2px rgba(14, 165, 233, 0.4)';
+                } else {
+                    c.style.borderColor = 'var(--border-subtle)';
+                    c.style.background = 'white';
+                    c.style.boxShadow = 'none';
+                }
+            });
+
+            document.querySelectorAll('.return-card').forEach(c => {
+                const r = c.querySelector('input[type="radio"]');
+                if (r && r.checked) {
+                    c.style.borderColor = 'var(--accent)';
+                    c.style.background = 'rgba(234, 88, 12, 0.05)';
+                    c.style.boxShadow = '0 0 0 2px rgba(234, 88, 12, 0.4)';
+                } else {
+                    c.style.borderColor = 'var(--border-subtle)';
+                    c.style.background = 'white';
+                    c.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        function updateRoundTripSummary() {
+            const outRadio = document.querySelector('input[name="roundTripOutboundRadio"]:checked');
+            const retRadio = document.querySelector('input[name="roundTripReturnRadio"]:checked');
+
+            let outPrice = 0;
+            let retPrice = 0;
+
+            if (outRadio) {
+                const card = outRadio.closest('.outbound-card');
+                if (card) {
+                    document.getElementById('lblOutboundFlight').textContent = card.dataset.flight + ' (' + card.dataset.airline + ')';
+                    outPrice = parseFloat(card.dataset.price) || 0;
+                }
+            } else {
+                document.getElementById('lblOutboundFlight').textContent = 'Chưa chọn';
+            }
+
+            if (retRadio) {
+                const card = retRadio.closest('.return-card');
+                if (card) {
+                    document.getElementById('lblReturnFlight').textContent = card.dataset.flight + ' (' + card.dataset.airline + ')';
+                    retPrice = parseFloat(card.dataset.price) || 0;
+                }
+            } else {
+                document.getElementById('lblReturnFlight').textContent = 'Chưa chọn';
+            }
+
+            const total = outPrice + retPrice;
+            document.getElementById('lblTotalPrice').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
+
+            const btn = document.getElementById('btnBookRoundTrip');
+            if (btn) {
+                if (!outRadio || !retRadio) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                } else {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            }
+        }
+
+        function submitRoundTripBooking() {
+            const outRadio = document.querySelector('input[name="roundTripOutboundRadio"]:checked');
+            const retRadio = document.querySelector('input[name="roundTripReturnRadio"]:checked');
+
+            if (!outRadio) {
+                alert('Vui lòng chọn 1 chuyến bay chiều đi!');
+                return;
+            }
+            if (!retRadio) {
+                alert('Vui lòng chọn 1 chuyến bay chiều về!');
+                return;
+            }
+
+            const outId = outRadio.value;
+            const retId = retRadio.value;
+            const seatClass = document.getElementById('flightSearchSeatClass')?.value || 'ECONOMY';
+            const passCount = document.getElementById('flightSearchPassengerCount')?.value || 1;
+
+            window.location.href = '/flights/' + outId + '/book?seatClass=' + seatClass + 
+                                  '&returnFlightId=' + retId + 
+                                  '&returnSeatClass=' + seatClass + 
+                                  '&passengerCount=' + passCount;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightSelectedCards();
+            updateRoundTripSummary();
+        });
+    </script>
+</body>
+</html>

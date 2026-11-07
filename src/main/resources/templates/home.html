@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VietTravel Hub - Đặt Vé Máy Bay &amp; Vé Tàu Hỏa Trực Tuyến</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('home')}"></header>
+
+    <!-- HERO BANNER -->
+    <section class="hero-banner">
+        <div class="app-container hero-content">
+            <h1 class="hero-title">Khám Phá Mọi Hành Trình Cùng VietTravel Hub</h1>
+            <p class="hero-subtitle">Đặt vé máy bay nội địa và vé tàu hỏa Thống Nhất trực quan, giữ chỗ 15 phút không lo tăng giá cùng đội ngũ tư vấn viên đồng hành 24/7.</p>
+        </div>
+    </section>
+
+    <!-- SEARCH WIDGET (FLOATING ON HERO) -->
+    <div class="app-container">
+        <div class="search-widget-card">
+            <!-- TABS SWITCHER -->
+            <div class="search-tabs">
+                <button type="button" class="search-tab-btn active" data-tab="flight">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                    Tìm Vé Máy Bay Nội Địa
+                </button>
+                <button type="button" class="search-tab-btn train-tab" data-tab="train">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                    Tìm Vé Tàu Hỏa Bắc Nam
+                </button>
+            </div>
+
+            <!-- FLIGHT SEARCH PANEL -->
+            <div id="flightSearchPanel">
+                <form method="get" action="/flights">
+                    <!-- LOẠI CHUYẾN BAY: MỘT CHIỀU / KHỨ HỒI -->
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 14px; font-size: 14px; font-weight: 600;">
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="false" checked id="tripTypeOneWay" style="accent-color: var(--primary);" onchange="toggleReturnDateField(false)" />
+                            <span>Một chiều</span>
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="true" id="tripTypeRoundTrip" style="accent-color: var(--primary);" onchange="toggleReturnDateField(true)" />
+                            <span>Khứ hồi (2 chiều)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 16px; align-items: flex-end;">
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                Sân bay / Điểm đi
+                            </label>
+                            <select name="departureAirport" id="departureAirportSelect" class="form-select">
+                                <option value="">-- Tất Cả Điểm Đi --</option>
+                                <optgroup label="Miền Bắc">
+                                    <option value="HAN" selected>Hà Nội (HAN) - Sân bay Nội Bài</option>
+                                    <option value="HPH">Hải Phòng (HPH) - Sân bay Cát Bi</option>
+                                    <option value="VDO">Quảng Ninh (VDO) - Sân bay Vân Đồn</option>
+                                    <option value="DIN">Điện Biên (DIN) - Sân bay Điện Biên Phủ</option>
+                                </optgroup>
+                                <optgroup label="Miền Trung &amp; Tây Nguyên">
+                                    <option value="DAD">Đà Nẵng (DAD) - Sân bay Quốc tế Đà Nẵng</option>
+                                    <option value="CXR">Nha Trang / Cam Ranh (CXR) - Sân bay Cam Ranh</option>
+                                    <option value="DLI">Đà Lạt (DLI) - Sân bay Liên Khương</option>
+                                    <option value="HUI">Huế (HUI) - Sân bay Phú Bài</option>
+                                    <option value="VII">Vinh (VII) - Sân bay Quốc tế Vinh</option>
+                                    <option value="UIH">Quy Nhơn (UIH) - Sân bay Phù Cát</option>
+                                    <option value="VDH">Đồng Hới (VDH) - Sân bay Đồng Hới</option>
+                                    <option value="THD">Thanh Hóa (THD) - Sân bay Thọ Xuân</option>
+                                    <option value="TBB">Tuy Hòa (TBB) - Sân bay Tuy Hòa</option>
+                                    <option value="BMV">Buôn Ma Thuột (BMV) - Sân bay Buôn Ma Thuột</option>
+                                    <option value="PXU">Pleiku (PXU) - Sân bay Pleiku</option>
+                                </optgroup>
+                                <optgroup label="Miền Nam">
+                                    <option value="SGN">TP. Hồ Chí Minh (SGN) - Sân bay Tân Sơn Nhất</option>
+                                    <option value="PQC">Phú Quốc (PQC) - Sân bay Quốc tế Phú Quốc</option>
+                                    <option value="VCA">Cần Thơ (VCA) - Sân bay Cần Thơ</option>
+                                    <option value="VCS">Côn Đảo (VCS) - Sân bay Côn Đảo</option>
+                                    <option value="VKG">Rạch Giá (VKG) - Sân bay Rạch Giá</option>
+                                    <option value="CAH">Cà Mau (CAH) - Sân bay Cà Mau</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 12h20"/><path d="M20 12l-4-4"/><path d="M20 12l-4 4"/></svg>
+                                Sân bay / Điểm đến
+                            </label>
+                            <select name="arrivalAirport" id="arrivalAirportSelect" class="form-select">
+                                <option value="">-- Tất Cả Điểm Đến --</option>
+                                <optgroup label="Miền Nam">
+                                    <option value="SGN" selected>TP. Hồ Chí Minh (SGN) - Sân bay Tân Sơn Nhất</option>
+                                    <option value="PQC">Phú Quốc (PQC) - Sân bay Quốc tế Phú Quốc</option>
+                                    <option value="VCA">Cần Thơ (VCA) - Sân bay Cần Thơ</option>
+                                    <option value="VCS">Côn Đảo (VCS) - Sân bay Côn Đảo</option>
+                                    <option value="VKG">Rạch Giá (VKG) - Sân bay Rạch Giá</option>
+                                    <option value="CAH">Cà Mau (CAH) - Sân bay Cà Mau</option>
+                                </optgroup>
+                                <optgroup label="Miền Trung &amp; Tây Nguyên">
+                                    <option value="DAD">Đà Nẵng (DAD) - Sân bay Quốc tế Đà Nẵng</option>
+                                    <option value="CXR">Nha Trang / Cam Ranh (CXR) - Sân bay Cam Ranh</option>
+                                    <option value="DLI">Đà Lạt (DLI) - Sân bay Liên Khương</option>
+                                    <option value="HUI">Huế (HUI) - Sân bay Phú Bài</option>
+                                    <option value="VII">Vinh (VII) - Sân bay Quốc tế Vinh</option>
+                                    <option value="UIH">Quy Nhơn (UIH) - Sân bay Phù Cát</option>
+                                    <option value="VDH">Đồng Hới (VDH) - Sân bay Đồng Hới</option>
+                                    <option value="THD">Thanh Hóa (THD) - Sân bay Thọ Xuân</option>
+                                    <option value="TBB">Tuy Hòa (TBB) - Sân bay Tuy Hòa</option>
+                                    <option value="BMV">Buôn Ma Thuột (BMV) - Sân bay Buôn Ma Thuột</option>
+                                    <option value="PXU">Pleiku (PXU) - Sân bay Pleiku</option>
+                                </optgroup>
+                                <optgroup label="Miền Bắc">
+                                    <option value="HAN">Hà Nội (HAN) - Sân bay Nội Bài</option>
+                                    <option value="HPH">Hải Phòng (HPH) - Sân bay Cát Bi</option>
+                                    <option value="VDO">Quảng Ninh (VDO) - Sân bay Vân Đồn</option>
+                                    <option value="DIN">Điện Biên (DIN) - Sân bay Điện Biên Phủ</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Ngày khởi hành</label>
+                            <input type="date" name="departureDate" class="form-control" />
+                        </div>
+                        <div id="homeReturnDateGroup" style="display: none;">
+                            <label class="form-label" style="color: var(--primary); font-weight: 700;">Ngày về (Khứ hồi)</label>
+                            <input type="date" name="returnDate" id="homeReturnDateInput" class="form-control" style="border-color: var(--primary);" />
+                        </div>
+                        <div>
+                            <label class="form-label">Số lượng khách</label>
+                            <select name="passengerCount" class="form-select">
+                                <option value="1">1 Hành khách</option>
+                                <option value="2">2 Hành khách</option>
+                                <option value="3">3 Hành khách</option>
+                                <option value="4">4 Hành khách</option>
+                                <option value="5">5 Hành khách</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-cta btn-block" style="padding: 12px 20px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                                Tìm Chuyến Bay
+                            </button>
+                        </div>
+                    </div>
+                    <div class="search-assurance-ribbon">
+                        <button type="button" id="swapAirportsBtn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--radius-full);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m7 16 5 5 5-5"/><path d="M12 21V3"/><path d="m17 8-5-5-5 5"/></svg>
+                            <span>Đảo Chiều Bay (Hà Nội &harr; TP.HCM)</span>
+                        </button>
+                        <div style="display: flex; gap: 18px; align-items: center; flex-wrap: wrap;">
+                            <span class="assurance-item">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <span>100% Vé chính hãng (Vietnam Airlines, Vietjet, Bamboo)</span>
+                            </span>
+                            <span class="assurance-item">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Giữ chỗ tự động 15 phút</span>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TRAIN SEARCH PANEL -->
+            <div id="trainSearchPanel" style="display: none;">
+                <form method="get" action="/trains">
+                    <!-- LOẠI VÉ TÀU: MỘT CHIỀU / KHỨ HỒI -->
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 14px; font-size: 14px; font-weight: 600;">
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="false" checked id="trainTripTypeOneWay" style="accent-color: var(--train-accent);" onchange="toggleTrainReturnDateField(false)" />
+                            <span>Một chiều</span>
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                            <input type="radio" name="roundTrip" value="true" id="trainTripTypeRoundTrip" style="accent-color: var(--train-accent);" onchange="toggleTrainReturnDateField(true)" />
+                            <span>Khứ hồi (2 chiều)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 16px; align-items: flex-end;">
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                                Ga Khởi Hành (Đi)
+                            </label>
+                            <select name="departureStationId" class="form-select" required>
+                                <option value="" disabled>-- Chọn Ga Khởi Hành --</option>
+                                <option th:each="st : ${stations}" th:value="${st.id}" th:text="${st.stationName + ' (Km ' + #numbers.formatInteger(st.distanceKm, 1, 'POINT') + ')'}" th:selected="${st.stationIndex == 1}">Ga Hà Nội (Km 0)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                                Ga Đến (Đến)
+                            </label>
+                            <select name="arrivalStationId" class="form-select" required>
+                                <option value="" disabled>-- Chọn Ga Đến --</option>
+                                <option th:each="st : ${stations}" th:value="${st.id}" th:text="${st.stationName + ' (Km ' + #numbers.formatInteger(st.distanceKm, 1, 'POINT') + ')'}" th:selected="${st.stationIndex == 11}">Ga Sài Gòn (Km 1.726)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Ngày Khởi Hành
+                            </label>
+                            <input type="date" name="departureDate" class="form-control" />
+                        </div>
+                        <div id="homeTrainReturnDateGroup" style="display: none;">
+                            <label class="form-label" style="display: flex; align-items: center; gap: 6px; color: var(--train-accent); font-weight: 700;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Ngày Về (Khứ hồi)
+                            </label>
+                            <input type="date" name="returnDate" id="homeTrainReturnDateInput" class="form-control" style="border-color: var(--train-accent);" />
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-train btn-block" style="padding: 12px 20px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                                Tìm Vé Tàu Hỏa
+                            </button>
+                        </div>
+                    </div>
+                    <div class="search-assurance-ribbon">
+                        <button type="button" id="swapStationsBtn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--radius-full);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m7 16 5 5 5-5"/><path d="M12 21V3"/><path d="m17 8-5-5-5 5"/></svg>
+                            <span>Đảo Chiều Tàu (Ga Hà Nội &harr; Ga Sài Gòn)</span>
+                        </button>
+                        <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                            <span class="assurance-item">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/></svg>
+                                <span>Đường sắt Thống Nhất Bắc - Nam (11 ga)</span>
+                            </span>
+                            <span class="assurance-item">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Sơ đồ chọn chỗ thời gian thực</span>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" style="padding-top: 40px;">
+        <div class="app-container">
+
+            <!-- ========================================== -->
+            <!-- 1. FLIGHT SHOWCASE (HIỂN THỊ KHI CHỌN TAB VÉ MÁY BAY) -->
+            <!-- ========================================== -->
+            <div id="flightShowcase" style="margin-bottom: 54px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span class="badge badge-primary">Hàng Không Nội Địa &bull; Vé Giá Tốt</span>
+                            <button type="button" data-switch-to="train" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 12px; border-radius: var(--radius-full);">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/></svg>
+                                Chuyển sang lịch tàu hỏa &rarr;
+                            </button>
+                        </div>
+                        <h2 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Chặng Bay Phổ Biến &amp; Giờ Vàng Ưu Đãi</h2>
+                        <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Tuyển tập các chặng bay thẳng kết nối các thành phố lớn với giá vé giữ chỗ 15 phút tốt nhất.</p>
+                    </div>
+                    <a href="/flights" class="btn btn-primary btn-sm" style="box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                        Xem tất cả lịch bay &rarr;
+                    </a>
+                </div>
+
+                <div class="grid-4">
+                    <!-- ROUTE 1 (FLIGHT) -->
+                    <div class="route-card">
+                        <div class="route-card-banner" style="background-image: url('/images/destinations/hanoi.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                    Trục Vàng Bắc Nam
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Hà Nội &bull; TP.HCM</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Bay thẳng 2 giờ 10 phút</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 14px;">1.200.000 đ</div>
+                            </div>
+                            <a href="/flights?departureAirport=HAN&arrivalAirport=SGN" class="btn btn-primary btn-sm btn-block">Đặt Vé Bay &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- ROUTE 2 (FLIGHT) -->
+                    <div class="route-card">
+                        <div class="route-card-banner" style="background-image: url('/images/destinations/danang.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                    Du Lịch Biển
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Hà Nội &bull; Đà Nẵng</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Bay thẳng 1 giờ 20 phút</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 14px;">850.000 đ</div>
+                            </div>
+                            <a href="/flights?departureAirport=HAN&arrivalAirport=DAD" class="btn btn-primary btn-sm btn-block">Đặt Vé Bay &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- ROUTE 3 (FLIGHT) -->
+                    <div class="route-card">
+                        <div class="route-card-banner" style="background-image: url('/images/destinations/phuquoc.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                    Đảo Ngọc
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">TP.HCM &bull; Phú Quốc</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Bay thẳng 1 giờ 00 phút</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 14px;">790.000 đ</div>
+                            </div>
+                            <a href="/flights?departureAirport=SGN&arrivalAirport=PQC" class="btn btn-primary btn-sm btn-block">Đặt Vé Bay &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- ROUTE 4 (FLIGHT) -->
+                    <div class="route-card">
+                        <div class="route-card-banner" style="background-image: url('/images/destinations/saigon.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                    Thành Phố Trẻ
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Đà Nẵng &bull; TP.HCM</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Bay thẳng 1 giờ 25 phút</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 14px;">820.000 đ</div>
+                            </div>
+                            <a href="/flights?departureAirport=DAD&arrivalAirport=SGN" class="btn btn-primary btn-sm btn-block">Đặt Vé Bay &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 2. TRAIN SHOWCASE (HIỂN THỊ KHI CHỌN TAB VÉ TÀU HỎA) -->
+            <!-- ========================================== -->
+            <div id="trainShowcase" style="display: none; margin-bottom: 54px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span class="badge badge-warning">Đường Sắt Việt Nam &bull; Tuyến Thống Nhất Bắc Nam</span>
+                            <button type="button" data-switch-to="flight" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 12px; border-radius: var(--radius-full);">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                                Chuyển sang lịch chuyến bay &rarr;
+                            </button>
+                        </div>
+                        <h2 style="font-size: 26px; font-weight: 800; color: #b45309; margin-bottom: 4px;">Bảng Giờ Tàu &amp; Lịch Trình Các Đoàn Tàu SE</h2>
+                        <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Lịch xuất phát hàng ngày các đoàn tàu nhanh SE1, SE3, SE5 kèm sơ đồ chọn chỗ trực quan 100% thời gian thực.</p>
+                    </div>
+                    <a href="/trains" class="btn btn-train btn-sm" style="box-shadow: var(--train-glow);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                        Xem tất cả lịch tàu &amp; chọn ghế &rarr;
+                    </a>
+                </div>
+
+                <!-- BẢNG LỊCH TRÌNH CÁC ĐOÀN TÀU SE1, SE3, SE5 -->
+                <div class="card" style="border-radius: var(--radius-lg); margin-bottom: 28px; box-shadow: var(--shadow-sm);">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+                        <div class="card-title" style="color: var(--train-accent); font-size: 17px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                            Lịch Chạy Các Đoàn Tàu Thống Nhất (Hà Nội &bull; Sài Gòn)
+                        </div>
+                        <span class="badge badge-warning">Khởi Hành Hàng Ngày</span>
+                    </div>
+
+                    <div class="table-responsive" style="border: none;">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Mã đoàn tàu</th>
+                                    <th>Tuyến hành trình</th>
+                                    <th>Giờ khởi hành ga đầu</th>
+                                    <th>Thời gian hành trình</th>
+                                    <th>Hạng chỗ phục vụ</th>
+                                    <th style="text-align: right;">Đặt vé ngay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="height: 26px; border-radius: 4px;" />
+                                            <span class="badge badge-warning" style="font-size: 14px; font-weight: 800; padding: 5px 10px;">SE1</span>
+                                            <span style="font-size: 11px; background: #ecfdf5; color: #065f46; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full);">Tàu Ngày</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary); font-size: 15px;">Hà Nội &rarr; Sài Gòn</strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Dừng 11 ga: Nam Định, Thanh Hóa, Vinh, Huế, Đà Nẵng, Nha Trang...</div>
+                                    </td>
+                                    <td>
+                                        <div style="font-size: 17px; font-weight: 800; color: #b45309;" class="tabular-nums">06:00 <small style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Sáng</small></div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary);">31 tiếng</strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Ngắm cảnh đèo Hải Vân</div>
+                                    </td>
+                                    <td style="font-size: 13px; line-height: 1.6;">
+                                        <div>&bull; Ghế mềm điều hòa (Toa 1)</div>
+                                        <div>&bull; Giường nằm K6 (Toa 2)</div>
+                                        <div>&bull; Giường nằm K4 VIP (Toa 3)</div>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-train btn-sm">
+                                            Chọn Chỗ Tàu SE1 &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="height: 26px; border-radius: 4px;" />
+                                            <span class="badge badge-warning" style="font-size: 14px; font-weight: 800; padding: 5px 10px;">SE3</span>
+                                            <span style="font-size: 11px; background: #eff6ff; color: #1e40af; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full);">Nhanh Nhất</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary); font-size: 15px;">Hà Nội &rarr; Sài Gòn</strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Tàu nhanh chất lượng cao, trang thiết bị hiện đại, hành trình êm ái</div>
+                                    </td>
+                                    <td>
+                                        <div style="font-size: 17px; font-weight: 800; color: #b45309;" class="tabular-nums">19:25 <small style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Tối</small></div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary);">30 tiếng</strong>
+                                        <div style="font-size: 12px; color: var(--success); font-weight: 600;">Thời gian chạy ngắn nhất</div>
+                                    </td>
+                                    <td style="font-size: 13px; line-height: 1.6;">
+                                        <div>&bull; Ghế mềm điều hòa cao cấp</div>
+                                        <div>&bull; Khoang giường nằm di sản VIP</div>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-train btn-sm">
+                                            Chọn Chỗ Tàu SE3 &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="height: 26px; border-radius: 4px;" />
+                                            <span class="badge badge-warning" style="font-size: 14px; font-weight: 800; padding: 5px 10px;">SE5</span>
+                                            <span style="font-size: 11px; background: #fff7ed; color: #c2410c; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full);">Tiết Kiệm</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary); font-size: 15px;">Hà Nội &rarr; Sài Gòn</strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Tuyến tàu truyền thống, giờ khởi hành buổi chiều thuận lợi cho du khách</div>
+                                    </td>
+                                    <td>
+                                        <div style="font-size: 17px; font-weight: 800; color: #b45309;">15:20 <small style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Chiều</small></div>
+                                    </td>
+                                    <td>
+                                        <strong style="color: var(--text-primary);">33 tiếng</strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">Hành trình trải nghiệm thư thái</div>
+                                    </td>
+                                    <td style="font-size: 13px; line-height: 1.6;">
+                                        <div>&bull; Ghế mềm điều hòa phổ thông</div>
+                                        <div>&bull; Giường nằm 6 chỗ tiết kiệm</div>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-train btn-sm">
+                                            Chọn Chỗ Tàu SE5 &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4 CHẶNG TÀU DI SẢN PHỔ BIẾN -->
+                <div style="margin-bottom: 16px;">
+                    <h3 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Chặng Tàu Hỏa Di Sản Được Đặt Nhiều Nhất</h3>
+                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">Giá vé tính chuẩn xác theo cự ly km thực tế của Tổng công ty Đường sắt Việt Nam.</p>
+                </div>
+                <div class="grid-4">
+                    <div class="route-card">
+                        <div class="route-card-banner train-banner" style="background-image: url('/images/destinations/haivan-train.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    Đường Sắt Di Sản
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Hà Nội &bull; Đà Nẵng</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Cự ly 791 km &bull; Đèo Hải Vân</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--train-accent); margin-bottom: 14px;">553.000 đ</div>
+                            </div>
+                            <a href="/trains?departureStationId=1&arrivalStationId=8" class="btn btn-train btn-sm btn-block">Chọn Chỗ Tàu &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="route-card">
+                        <div class="route-card-banner train-banner" style="background-image: url('/images/destinations/hue.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    Cố Đô Di Sản
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Hà Nội &bull; Huế</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Cự ly 688 km &bull; Giường nằm đêm</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--train-accent); margin-bottom: 14px;">481.000 đ</div>
+                            </div>
+                            <a href="/trains?departureStationId=1&arrivalStationId=7" class="btn btn-train btn-sm btn-block">Chọn Chỗ Tàu &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="route-card">
+                        <div class="route-card-banner train-banner" style="background-image: url('/images/destinations/nhatrang.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    Cung Đường Duyên Hải
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Đà Nẵng &bull; Sài Gòn</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Cự ly 935 km &bull; Biển Nam Trung Bộ</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--train-accent); margin-bottom: 14px;">654.000 đ</div>
+                            </div>
+                            <a href="/trains?departureStationId=8&arrivalStationId=11" class="btn btn-train btn-sm btn-block">Chọn Chỗ Tàu &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="route-card">
+                        <div class="route-card-banner train-banner" style="background-image: url('/images/destinations/haivan-train.jpg');">
+                            <div style="text-align: center;">
+                                <span class="badge" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: #fff; margin-bottom: 8px; font-size: 11px;">
+                                    Xuyên Việt Thống Nhất
+                                </span>
+                                <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Hà Nội &bull; Sài Gòn</div>
+                                <small style="opacity: 0.95; font-size: 12px; font-weight: 500;">Cự ly 1.726 km &bull; Toàn tuyến</small>
+                            </div>
+                        </div>
+                        <div class="route-card-body">
+                            <div>
+                                <small style="color: var(--text-muted);">Mức giá từ</small>
+                                <div style="font-size: 22px; font-weight: 800; color: var(--train-accent); margin-bottom: 14px;">1.208.000 đ</div>
+                            </div>
+                            <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-train btn-sm btn-block">Chọn Chỗ Tàu &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAILWAY TRANSIT 11 STATIONS SHOWCASE INSIDE TRAIN SHOWCASE -->
+                <div class="card" style="border-radius: var(--radius-xl); border: 1px solid var(--train-border); background: #fffdfa; padding: 26px; margin-top: 28px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <span class="badge badge-warning">Hệ Thống Nhà Ga</span>
+                                <span style="font-size: 13px; font-weight: 700; color: var(--train-accent);">11 Điểm Dừng Trọng Điểm</span>
+                            </div>
+                            <h3 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0;">Mạng Lưới Ga Trục Bắc - Nam Nối Liền Chiều Dài Đất Nước</h3>
+                        </div>
+                        <a href="/trains" class="btn btn-train btn-sm">Tra Cứu Ga &rarr;</a>
+                    </div>
+
+                    <!-- STATION CHIPS TIMELINE -->
+                    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin;">
+                        <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Ga Hà Nội (Km 0)</a>
+                        <a href="/trains?departureStationId=2&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Nam Định (Km 87)</a>
+                        <a href="/trains?departureStationId=3&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Ninh Bình (Km 115)</a>
+                        <a href="/trains?departureStationId=4&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Thanh Hóa (Km 176)</a>
+                        <a href="/trains?departureStationId=5&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Vinh (Km 319)</a>
+                        <a href="/trains?departureStationId=6&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Đồng Hới (Km 522)</a>
+                        <a href="/trains?departureStationId=7&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Huế (Km 688)</a>
+                        <a href="/trains?departureStationId=8&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Đà Nẵng (Km 791)</a>
+                        <a href="/trains?departureStationId=9&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Nha Trang (Km 1315)</a>
+                        <a href="/trains?departureStationId=10&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Bình Thuận (Km 1551)</a>
+                        <a href="/trains?departureStationId=1&arrivalStationId=11" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Sài Gòn (Km 1726)</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- WHY CHOOSE US -->
+            <div style="margin-bottom: 50px;">
+                <div style="text-align: center; max-width: 680px; margin: 0 auto 36px auto;">
+                    <h2 style="font-size: 26px; font-weight: 750; color: var(--text-primary); margin-bottom: 8px;">Tiêu Chuẩn Dịch Vụ Du Lịch Chuẩn Mực</h2>
+                    <p style="font-size: 14.5px; color: var(--text-secondary); margin: 0;">Trải nghiệm đặt vé thông minh, bảo mật dữ liệu tuyệt đối và minh bạch trong từng giao dịch</p>
+                </div>
+
+                <div class="grid-4">
+                    <div class="card card-hover" style="text-align: center; padding: 32px 22px; border-radius: var(--radius-lg);">
+                        <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--primary-subtle); color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px auto;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 800; margin-bottom: 8px;">Giữ Chỗ Linh Hoạt</h3>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">Khóa nguyên giá vé ưu đãi trong 15 phút (vé máy bay) hoặc 10 phút (vé tàu) để bạn an tâm thanh toán.</p>
+                    </div>
+
+                    <div class="card card-hover" style="text-align: center; padding: 32px 22px; border-radius: var(--radius-lg);">
+                        <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--accent-subtle); color: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px auto;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 800; margin-bottom: 8px;">Hoàn Đổi Minh Bạch</h3>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">Chính sách phí đổi chuyến và hoàn tiền được tính tự động theo quy định của hãng và giờ khởi hành.</p>
+                    </div>
+
+                    <div class="card card-hover" style="text-align: center; padding: 32px 22px; border-radius: var(--radius-lg);">
+                        <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--train-subtle); color: var(--train-accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px auto;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 800; margin-bottom: 8px;">Ưu Đãi Đối Tượng</h3>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">Giảm trừ trực tiếp 10% - 25% cho trẻ em, học sinh sinh viên và người cao tuổi theo chính sách ngành.</p>
+                    </div>
+
+                    <div class="card card-hover" style="text-align: center; padding: 32px 22px; border-radius: var(--radius-lg);">
+                        <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--consult-subtle); color: var(--consult-accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px auto;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 800; margin-bottom: 8px;">Tư Vấn Tận Tâm</h3>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">Đặt lịch hẹn miễn phí, chuyên viên xếp tour đoàn, xuất hóa đơn VAT và chăm sóc khách hàng 24/7.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONSULTATION CALL-TO-ACTION CARD -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(15, 41, 66, 0.78) 0%, rgba(15, 41, 66, 0.65) 100%), url('/images/banners/consultation-banner.jpg') center/cover no-repeat; color: #ffffff; padding: 40px; border-radius: var(--radius-lg); margin-bottom: 40px; box-shadow: var(--shadow-lg); border: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+                    <div style="max-width: 640px;">
+                        <h2 style="font-size: 26px; font-weight: 750; color: #ffffff; margin-bottom: 10px;">Cần Tư Vấn Đặt Vé Cho Đoàn Hoặc Gia Đình?</h2>
+                        <p style="font-size: 14.5px; color: rgba(255,255,255,0.92); margin: 0; line-height: 1.6;">Chọn thời gian phù hợp với bạn, chuyên viên giàu kinh nghiệm của VietTravel Hub sẽ liên hệ hỗ trợ sắp xếp lộ trình, vé đoàn chiết khấu và giữ chỗ ưu tiên.</p>
+                    </div>
+                    <a href="/consultations/new" class="btn btn-cta btn-lg" style="padding: 13px 28px;">
+                        Đặt Lịch Hẹn Tư Vấn Miễn Phí &rarr;
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+    <script>
+        function toggleReturnDateField(isRoundTrip) {
+            const grp = document.getElementById('homeReturnDateGroup');
+            const inp = document.getElementById('homeReturnDateInput');
+            if (grp) {
+                grp.style.display = isRoundTrip ? 'block' : 'none';
+                if (!isRoundTrip && inp) inp.value = '';
+            }
+        }
+
+        function toggleTrainReturnDateField(isRoundTrip) {
+            const grp = document.getElementById('homeTrainReturnDateGroup');
+            const inp = document.getElementById('homeTrainReturnDateInput');
+            if (grp) {
+                grp.style.display = isRoundTrip ? 'block' : 'none';
+                if (!isRoundTrip && inp) inp.value = '';
+            }
+        }
+    </script>
+</body>
+</html>

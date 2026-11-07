@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <!-- COMPREHENSIVE ENTERPRISE FOOTER FRAGMENT -->
+    <footer th:fragment="app-footer" class="app-footer">
+        
+        <!-- TRUST BADGES BAR -->
+        <div class="footer-trust-bar">
+            <div class="app-container">
+                <div class="footer-trust-grid">
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div>
+                            <strong>Vé Chính Hãng 100%</strong>
+                            <span>Kết nối trực tiếp Hàng không &amp; Đường sắt VN</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div>
+                            <strong>Giữ Chỗ Linh Hoạt</strong>
+                            <span>Tạm giữ chỗ máy bay 15 phút, vé tàu 10 phút</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        </div>
+                        <div>
+                            <strong>Thanh Toán An Toàn</strong>
+                            <span>Bảo mật chuẩn quốc tế PCI-DSS &amp; mã hóa SSL</span>
+                        </div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </div>
+                        <div>
+                            <strong>Hỗ Trợ Tận Tâm 24/7</strong>
+                            <span>Hotline 1900 6868 sẵn sàng tư vấn &amp; đổi vé</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN FOOTER COLUMNS -->
+        <div class="footer-main">
+            <div class="app-container">
+                <div class="footer-grid">
+                    <!-- COL 1: BRAND & CONTACT -->
+                    <div class="footer-col brand-col">
+                        <a href="/" class="footer-brand">
+                            <div class="brand-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                            </div>
+                            <span>VietTravel Hub</span>
+                        </a>
+                        <p class="footer-desc">
+                            Hệ thống công nghệ đặt vé máy bay nội địa và vé tàu hỏa Bắc - Nam trực tuyến hàng đầu Việt Nam. Tối ưu hóa trải nghiệm di chuyển với thông tin minh bạch, giữ chỗ tự động và chăm sóc tận tâm.
+                        </p>
+                        
+                        <!-- HOTLINE BOX -->
+                        <div class="footer-hotline-card">
+                            <div class="hotline-icon-badge">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div>
+                                <small>Tổng đài CSKH &amp; Hỗ trợ 24/7</small>
+                                <strong>1900 6868</strong>
+                            </div>
+                        </div>
+
+                        <ul class="footer-contact-list">
+                            <li>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <span>Email hỗ trợ: <strong>support@viettravelhub.vn</strong></span>
+                            </li>
+                            <li>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>Trụ sở TP.HCM: 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1</span>
+                            </li>
+                            <li>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>Văn phòng Hà Nội: 88 Cầu Giấy, Q. Cầu Giấy, TP. Hà Nội</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- COL 2: SERVICES & TRAVEL -->
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Dịch Vụ Đặt Vé</h4>
+                        <ul class="footer-links">
+                            <li><a href="/flights">✈️ Vé máy bay Vietnam Airlines</a></li>
+                            <li><a href="/flights">✈️ Vé máy bay Vietjet Air</a></li>
+                            <li><a href="/flights">✈️ Vé máy bay Bamboo Airways</a></li>
+                            <li><a href="/trains">🚆 Vé tàu hỏa Bắc - Nam (SE1, SE3, SE5)</a></li>
+                            <li><a href="/flights">🔍 Tra cứu lịch bay &amp; Giá cơ bản</a></li>
+                            <li><a href="/trains">🗺️ Sơ đồ chọn chỗ &amp; Ga dừng tuyến</a></li>
+                            <li><a href="/consultations/book">🛎️ Đặt lịch hẹn tư vấn du lịch</a></li>
+                            <li><a href="/my-bookings">🎫 Tra cứu &amp; Quản lý đơn vé đã đặt</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- COL 3: POLICIES & GUIDES -->
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Chính Sách &amp; Tiện Ích</h4>
+                        <ul class="footer-links">
+                            <li><a href="/policies">📋 Hướng dẫn đặt chỗ &amp; Nhận mã PNR</a></li>
+                            <li><a href="/policies">🔄 Quy định đổi vé &amp; Hoàn hủy minh bạch</a></li>
+                            <li><a href="/policies">🧳 Tiêu chuẩn hành lý miễn cước</a></li>
+                            <li><a href="/policies">🪪 Giấy tờ tùy thân hợp lệ khi đi lại</a></li>
+                            <li><a href="/policies">🎖️ Ưu đãi học sinh, sinh viên &amp; người cao tuổi</a></li>
+                            <li><a href="/policies">🛡️ Chính sách bảo mật &amp; Quyền riêng tư</a></li>
+                            <li><a href="/policies">📄 Điều khoản dịch vụ VietTravel Hub</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- COL 4: PARTNERS & SECURE PAYMENTS -->
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Đối Tác &amp; Thanh Toán</h4>
+                        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5;">
+                            Đối tác vận tải hàng không &amp; đường sắt chính thức:
+                        </p>
+                        
+                        <div class="footer-partner-badges">
+                            <span class="partner-badge">Vietnam Airlines</span>
+                            <span class="partner-badge">Vietjet Air</span>
+                            <span class="partner-badge">Bamboo Airways</span>
+                            <span class="partner-badge">Đường Sắt Việt Nam (VNR)</span>
+                        </div>
+
+                        <h4 class="footer-heading" style="margin-top: 22px;">Phương Thức Thanh Toán</h4>
+                        <div class="footer-payment-methods">
+                            <div class="pay-chip" title="VNPAY-QR Quét mã tức thì">VNPAY-QR</div>
+                            <div class="pay-chip" title="Thẻ ATM / Internet Banking">ATM / Napas</div>
+                            <div class="pay-chip" title="Thẻ Quốc tế Visa">Visa</div>
+                            <div class="pay-chip" title="Thẻ Quốc tế MasterCard">Mastercard</div>
+                            <div class="pay-chip" title="Chuyển khoản 24/7">Bank Transfer</div>
+                        </div>
+
+                        <div class="footer-cert-badges">
+                            <div class="cert-item">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                <span>Mã hóa SSL 256-bit chuẩn quốc tế</span>
+                            </div>
+                            <div class="cert-item">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                <span>Đã đăng ký với Bộ Công Thương</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER BOTTOM COPYRIGHT BAR -->
+        <div class="footer-bottom">
+            <div class="app-container footer-bottom-inner">
+                <div>
+                    <div>VietTravel Hub &copy; 2026. Bản quyền thuộc về Công ty Cổ phần Công nghệ Du lịch VietTravel Hub.</div>
+                    <small style="opacity: 0.75; display: block; margin-top: 3px;">Giấy phép kinh doanh dịch vụ đặt vé trực tuyến &amp; đại lý vận tải số 010896868 do Sở KH&amp;ĐT TP. Hà Nội cấp.</small>
+                </div>
+                
+                <div style="font-size: 12px; color: #64748b;">
+                    Đồng hành cùng mọi hành trình an toàn &bull; Tiết kiệm &bull; Tin cậy
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

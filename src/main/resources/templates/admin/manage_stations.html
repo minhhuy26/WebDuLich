@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Ga Tàu (Admin) - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar-wrapper">
+        <div class="app-container-lg">
+            <nav class="navbar">
+                <a href="/admin" class="nav-brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    </div>
+                    <span>VietTravel Hub &bull; Quản Trị</span>
+                </a>
+                <div class="nav-actions">
+                    <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard Quản Trị</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 26px;">
+        <div class="app-container-lg">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 10px;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
+                        Quản Lý Danh Mục Ga Đường Sắt
+                    </h1>
+                    <small style="color: var(--text-secondary);">Quản lý danh mục các ga dừng và khoảng cách cự ly dọc tuyến đường sắt Bắc - Nam</small>
+                </div>
+                <span class="badge badge-warning">Chỉ dành cho ADMIN</span>
+            </div>
+
+            <!-- SUCCESS ALERT -->
+            <div th:if="${successMessage != null}" class="alert alert-success">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <div th:text="${successMessage}">Thao tác thành công</div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="card" style="margin-bottom: 30px; border-radius: var(--radius-lg); border-top: 4px solid var(--train-accent);">
+                <div class="card-header">
+                    <div class="card-title" style="color: #b45309;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                        Thêm Ga Tàu Mới
+                    </div>
+                </div>
+
+                <form method="post" th:action="@{/admin/stations}" th:object="${newStation}" data-protect>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Tên Ga (*)</label>
+                            <input type="text" th:field="*{stationName}" class="form-control" placeholder="Ga Ninh Bình" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã Ga (*)</label>
+                            <input type="text" th:field="*{stationCode}" class="form-control" placeholder="NB" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cột mốc khoảng cách (Km) (*)</label>
+                            <input type="number" th:field="*{distanceKm}" class="form-control" placeholder="115" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Thứ tự ga (Index) (*)</label>
+                            <input type="number" th:field="*{stationIndex}" class="form-control" placeholder="2" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tên tuyến đường</label>
+                            <input type="text" th:field="*{routeName}" class="form-control" value="Bac-Nam" required />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-train" style="margin-top: 10px;">
+                        Lưu Ga Tàu Mới &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <!-- TABLE CARD -->
+            <div class="card" style="border-radius: var(--radius-lg); padding: 0; overflow: hidden;">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-alt);">
+                    <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">
+                        Danh Sách Ga Dọc Tuyến Bắc - Nam (Theo Thứ Tự Km)
+                    </div>
+                </div>
+                <div class="table-responsive" style="border: none;">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Thứ tự (Index)</th>
+                                <th>Tên Ga</th>
+                                <th>Mã Ga</th>
+                                <th>Cột mốc (Km)</th>
+                                <th>Tuyến đường</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="st : ${stations}">
+                                <td><span class="badge badge-neutral" th:text="${st.stationIndex}">1</span></td>
+                                <td><strong style="color: var(--text-primary);" th:text="${st.stationName}">Ga Hà Nội</strong></td>
+                                <td><code style="font-weight: 700; color: var(--train-accent);" th:text="${st.stationCode}">HAN</code></td>
+                                <td><strong th:text="${st.distanceKm + ' km'}">0 km</strong></td>
+                                <td th:text="${st.routeName}">Bac-Nam</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <div class="app-container-lg footer-inner">
+            <div>VietTravel Hub &copy; 2026. Quản trị hệ thống.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

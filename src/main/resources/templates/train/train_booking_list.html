@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Đơn Đặt Vé Tàu Hỏa - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('trains')}"></header>
+
+    <main class="main-content" style="padding-top: 30px;">
+        <div class="app-container">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 10px;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                        <span th:text="${isManager ? 'Quản Lý Đơn Vé Tàu Hỏa' : 'Tra Cứu & Đơn Vé Tàu Đã Đặt'}">Quản Lý Đơn Vé Tàu Hỏa</span>
+                    </h1>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin: 0;"
+                       th:text="${isManager ? 'Theo dõi quy trình chọn chỗ chặng, giữ chỗ 10 phút, xuất vé và chính sách trả vé toàn hệ thống' : 'Xem lại các đơn vé bạn đã đặt hoặc tra cứu nhanh bằng Số điện thoại / Mã đơn vé tàu'}">
+                        Theo dõi quy trình chọn chỗ chặng, giữ chỗ 10 phút, xuất vé và chính sách trả vé
+                    </p>
+                </div>
+                <a href="/trains" class="btn btn-train">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                    Đặt Thêm Vé Tàu
+                </a>
+            </div>
+
+            <!-- SEARCH BAR FOR LOOKUP -->
+            <div class="card" style="margin-bottom: 24px; padding: 18px 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                <form method="get" action="/trains/bookings" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <input type="text" name="searchKeyword" th:value="${searchKeyword}" placeholder="Nhập Số điện thoại hoặc Mã đơn vé tàu (VD: SE-TRN-xxx)..." class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-train" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                        Tra Cứu Vé Tàu
+                    </button>
+                    <a th:if="${searchKeyword != null and searchKeyword != ''}" href="/trains/bookings" class="btn btn-secondary">Xóa tra cứu</a>
+                </form>
+            </div>
+
+            <!-- MEMBER PERKS BANNER -->
+            <div th:if="${!isManager}" class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-left: 4px solid var(--train-accent); padding: 16px 22px; border-radius: var(--radius-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <strong style="color: #92400e; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                            Ưu đãi thành viên VietTravel Hub:
+                        </strong>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 4px 0 0 0;">
+                            Đăng nhập tài khoản để được tự động lưu toàn bộ lịch sử vé, <strong>tích lũy điểm thưởng</strong> mỗi chặng đi và <strong>tự động điền sẵn thông tin</strong> cho lần đặt sau (không cần nhập lại)!
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/login" class="btn btn-primary btn-sm">Đăng Nhập</a>
+                        <a href="/register" class="btn btn-secondary btn-sm">Đăng Ký Thành Viên</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHƯA TRA CỨU (HƯỚNG DẪN TRA CỨU BẢO MẬT KHI CHƯA ĐĂNG NHẬP) -->
+            <div th:if="${!isManager and !hasSearched}" class="card" style="text-align: center; padding: 48px 24px; border-radius: var(--radius-lg); background: #ffffff; box-shadow: var(--shadow-sm); border: 2px dashed #cbd5e1;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: #fef3c7; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--train-accent);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Tra Cứu Thông Tin Đơn Vé Tàu Hỏa</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; max-width: 540px; margin: 0 auto 20px auto; line-height: 1.6;">
+                    Để đảm bảo an toàn &amp; bảo mật thông tin hành khách, hệ thống không công khai danh sách đơn đặt chỗ. Quý khách vui lòng nhập <strong>Số điện thoại</strong> hoặc <strong>Mã đơn vé tàu</strong> (VD: <code>SE-TRN-xxx</code>) vào ô tìm kiếm bên trên để tra cứu.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <a href="/trains" class="btn btn-train btn-sm">Tìm Chuyến Tàu Ngay &rarr;</a>
+                    <a href="/login" class="btn btn-secondary btn-sm">Đăng Nhập Thành Viên</a>
+                </div>
+            </div>
+
+            <!-- ĐÃ TRA CỨU NHƯNG KHÔNG TÌM THẤY KẾT QUẢ -->
+            <div th:if="${hasSearched and #lists.isEmpty(bookings)}" class="empty-state">
+                <div class="empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </div>
+                <div class="empty-title">Không tìm thấy đơn vé tàu nào</div>
+                <p class="empty-desc">
+                    Không tìm thấy đơn vé nào khớp với thông tin tra cứu: "<strong th:text="${searchKeyword}"></strong>". Vui lòng kiểm tra lại chính xác Số điện thoại hoặc Mã đơn vé đã đặt.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 14px;">
+                    <a href="/trains/bookings" class="btn btn-secondary btn-sm">Tra Cứu Lại</a>
+                    <a href="/trains" class="btn btn-train btn-sm">Đặt Vé Mới &rarr;</a>
+                </div>
+            </div>
+
+            <!-- ADMIN/STAFF: CHƯA CÓ ĐƠN NÀO TRÊN HỆ THỐNG -->
+            <div th:if="${isManager and !hasSearched and #lists.isEmpty(bookings)}" class="empty-state">
+                <div class="empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/></svg>
+                </div>
+                <div class="empty-title">Chưa có đơn vé tàu nào trên hệ thống</div>
+            </div>
+
+            <!-- BOOKINGS TABLE (HIỂN THỊ KHI CÓ KẾT QUẢ TRA CỨU HOẶC ADMIN QUẢN LÝ) -->
+            <div th:if="${not #lists.isEmpty(bookings)}" class="card" style="border-radius: var(--radius-lg); padding: 0; overflow: hidden;">
+                <div th:if="${!isManager and hasSearched}" style="padding: 12px 20px; background: #fefce8; border-bottom: 1px solid #fef08a; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: #854d0e; font-weight: 600;">
+                        ✓ Tìm thấy <span th:text="${#lists.size(bookings)}"></span> đơn vé khớp với thông tin tra cứu "<span th:text="${searchKeyword}"></span>"
+                    </span>
+                    <a href="/trains/bookings" style="font-size: 12px; color: #a16207; text-decoration: underline;">Xóa tra cứu</a>
+                </div>
+                <div class="table-responsive" style="border: none;">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn vé</th>
+                                <th>Đoàn tàu</th>
+                                <th>Hành trình chặng</th>
+                                <th>Người đặt / SĐT</th>
+                                <th>Số vé</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th style="text-align: right;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${bookings}">
+                                <td>
+                                    <code style="font-weight: 800; color: var(--train-accent);" th:text="${b.bookingCode}">SE-TRN-123</code>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--text-primary);" th:text="${b.train.trainCode}">SE1</strong>
+                                    <span th:if="${b.isRoundTrip}" class="badge badge-warning" style="margin-left: 4px; font-size: 11px;">Khứ hồi</span>
+                                    <div th:if="${b.isRoundTrip and b.returnTrain != null}" style="font-size: 11px; color: var(--text-muted);" th:text="'Về: ' + ${b.returnTrain.trainCode}"></div>
+                                    <small style="color: var(--text-muted);" th:text="${b.train.routeName}">Hà Nội - Sài Gòn</small>
+                                </td>
+                                <td>
+                                    <span th:text="${b.departureStation.stationName + ' &rarr; ' + b.arrivalStation.stationName}">Ga Hà Nội -> Ga Đà Nẵng</span>
+                                    <div th:if="${b.isRoundTrip and b.returnTrain != null}" style="font-size: 11px; color: var(--text-muted);" th:text="'Về: ' + ${b.arrivalStation.stationName + ' &rarr; ' + b.departureStation.stationName}"></div>
+                                    <small style="color: var(--text-muted);" th:text="${#temporals.format(b.departureDate, 'dd/MM/yyyy')}"></small>
+                                    <small th:if="${b.isRoundTrip and b.returnDepartureDate != null}" style="color: var(--text-muted);" th:text="' - ' + ${#temporals.format(b.returnDepartureDate, 'dd/MM/yyyy')}"></small>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600;" th:text="${b.customerName}">Nguyễn Văn A</span><br/>
+                                    <small style="color: var(--text-muted);" th:text="${b.customerPhone}">0912345678</small>
+                                </td>
+                                <td th:text="${b.ticketCount + ' vé'}">1 vé</td>
+                                <td>
+                                    <strong style="color: var(--accent);" th:text="${#numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}">553,700 đ</strong>
+                                </td>
+                                <td>
+                                    <span th:if="${b.status.name() == 'HELD'}" class="badge badge-warning"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Giữ chỗ (10p)</span>
+                                    <span th:if="${b.status.name() == 'ISSUED'}" class="badge badge-success"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-1px;"><polyline points="20 6 9 17 4 12"/></svg> Đã xuất vé</span>
+                                    <span th:if="${b.status.name() == 'CANCELLED'}" class="badge badge-danger"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-1px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Đã hủy / trả</span>
+                                    <span th:if="${b.status.name() == 'EXPIRED'}" class="badge badge-neutral"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Hết hạn</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a th:href="@{'/trains/booking/' + ${b.bookingCode}}" class="btn btn-outline btn-sm">
+                                        Chi tiết &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Người Dùng &amp; Phân Quyền - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar-wrapper">
+        <div class="app-container-lg">
+            <nav class="navbar">
+                <a href="/admin" class="nav-brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    </div>
+                    <span>VietTravel Hub &bull; Quản Trị</span>
+                </a>
+                <div class="nav-actions">
+                    <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard Quản Trị</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 26px;">
+        <div class="app-container-lg">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Quản Lý Người Dùng &amp; Phân Quyền
+                    </h1>
+                    <small style="color: var(--text-secondary);">Quản trị tài khoản 3 vai trò: KHACH, NHANVIEN, ADMIN với mật khẩu mã hóa BCrypt</small>
+                </div>
+                <span class="badge badge-danger">Chỉ dành cho ADMIN</span>
+            </div>
+
+            <!-- ALERTS -->
+            <div th:if="${successMessage != null}" class="alert alert-success">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <div th:text="${successMessage}">Thao tác thành công</div>
+            </div>
+            <div th:if="${errorMessage != null}" class="alert alert-danger">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                <div th:text="${errorMessage}">Lỗi thao tác</div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="card" style="margin-bottom: 30px; border-radius: var(--radius-lg); border-top: 4px solid var(--primary-dark);">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                        Thêm Tài Khoản Mới
+                    </div>
+                </div>
+
+                <form method="post" th:action="@{/admin/users}" th:object="${newUser}" data-protect>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Tên đăng nhập <span class="required">*</span></label>
+                            <input type="text" th:field="*{username}" class="form-control" placeholder="nhanvien_moi" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mật khẩu <span class="required">*</span></label>
+                            <input type="password" th:field="*{password}" class="form-control" placeholder="Tối thiểu 6 ký tự" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Họ và tên đầy đủ <span class="required">*</span></label>
+                            <input type="text" th:field="*{fullName}" class="form-control" placeholder="Nguyễn Văn B" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email <span class="required">*</span></label>
+                            <input type="email" th:field="*{email}" class="form-control" placeholder="user@dulich.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" th:field="*{phone}" class="form-control" placeholder="0912345678" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vai trò (Role) <span class="required">*</span></label>
+                            <select th:field="*{role}" class="form-select">
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r.displayName + ' (' + r.name() + ')'}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        Tạo Tài Khoản &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <!-- TABLE CARD -->
+            <div class="card" style="border-radius: var(--radius-lg); padding: 0; overflow: hidden;">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-alt);">
+                    <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">
+                        Danh Sách Tài Khoản Trong Cơ Sở Dữ Liệu
+                    </div>
+                </div>
+                <div class="table-responsive" style="border: none;">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Họ và tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th style="text-align: right;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="u : ${users}">
+                                <td th:text="${u.id}"></td>
+                                <td><code style="font-weight: 700; color: var(--primary);" th:text="${u.username}"></code></td>
+                                <td><strong th:text="${u.fullName}"></strong></td>
+                                <td th:text="${u.email}"></td>
+                                <td th:text="${u.phone ?: '-'}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${u.role.name() == 'ADMIN' ? 'role-admin' : (u.role.name() == 'KHACH' ? 'role-khach' : 'role-nhanvien')}"
+                                          th:text="${u.role.displayName}"></span>
+                                </td>
+                                <td>
+                                    <span th:if="${u.status}" class="badge badge-success">Hoạt động</span>
+                                    <span th:unless="${u.status}" class="badge badge-danger">Đã khóa</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <form method="post" th:action="@{'/admin/users/' + ${u.id} + '/toggle-status'}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm" 
+                                                th:classappend="${u.status ? 'btn-danger-outline' : 'btn-outline'}"
+                                                th:text="${u.status ? 'Khóa' : 'Kích hoạt'}"></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <div class="app-container-lg footer-inner">
+            <div>VietTravel Hub &copy; 2026. Quản trị hệ thống.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

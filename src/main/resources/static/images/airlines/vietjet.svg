@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <rect width="200" height="50" rx="8" fill="#DA251D"/>
+  <!-- Wing curves in yellow -->
+  <path d="M12 25 Q25 12 40 25 Q25 38 12 25 Z" fill="#FFD100"/>
+  <!-- Text -->
+  <text x="48" y="27" font-family="'Be Vietnam Pro', sans-serif" font-size="16" font-weight="900" fill="#ffffff" font-style="italic">vietjet</text>
+  <text x="108" y="27" font-family="'Be Vietnam Pro', sans-serif" font-size="16" font-weight="900" fill="#FFD100" font-style="italic">Air</text>
+  <text x="48" y="40" font-family="'Be Vietnam Pro', sans-serif" font-size="8.5" font-weight="700" fill="#ffffff" letter-spacing="0.5">BAY LÀ THÍCH NGAY!</text>
+</svg>

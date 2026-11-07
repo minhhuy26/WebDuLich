@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Kiếm Vé Tàu Hỏa - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('trains')}"></header>
+
+    <main class="main-content" style="padding-top: 30px;">
+        <div class="app-container">
+
+            <!-- SEARCH HERO BOX -->
+            <div class="card" style="box-shadow: var(--shadow-md); border-radius: var(--radius-lg); margin-bottom: 30px; background: #ffffff;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h1 style="font-size: 24px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 10px;">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                            Tìm Kiếm &amp; Đặt Vé Tàu Hỏa (Một Chiều &amp; Khứ Hồi)
+                        </h1>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Đường sắt Bắc - Nam hai chiều | Phân đoạn chặng linh hoạt &amp; Ưu đãi theo đối tượng</p>
+                    </div>
+                    <span class="badge badge-warning" style="padding: 6px 14px; font-size: 13px;">Đường sắt Quốc gia VNR</span>
+                </div>
+
+                <!-- POLICY BOX -->
+                <div class="alert alert-warning" style="margin-bottom: 20px;">
+                    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+                    <div style="font-size: 13px;">
+                        <strong>Chính sách ưu đãi đường sắt:</strong> Giảm giá trực tiếp <strong>25%</strong> cho trẻ em (6-10 tuổi), <strong>10%</strong> cho sinh viên, <strong>15%</strong> cho người cao tuổi (&ge;60 tuổi). Giữ chỗ trực tuyến miễn phí trong <strong>10 phút</strong>.
+                    </div>
+                </div>
+
+                <!-- ERROR ALERT -->
+                <div th:if="${errorMessage != null}" class="alert alert-danger" style="margin-bottom: 20px;" th:text="${errorMessage}"></div>
+
+                <!-- SEARCH FORM -->
+                <form method="get" action="/trains" id="trainSearchForm">
+                    <!-- RADIO ROUND TRIP -->
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-subtle);">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text-primary);">
+                            <input type="radio" name="roundTrip" value="false" th:checked="${!searchDto.roundTrip}" id="trainOneWayRadio" style="width: 16px; height: 16px; accent-color: var(--train-accent);" onchange="toggleTrainReturnDate(false)" />
+                            <span>Vé Một Chiều</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--train-accent);">
+                            <input type="radio" name="roundTrip" value="true" th:checked="${searchDto.roundTrip}" id="trainRoundTripRadio" style="width: 16px; height: 16px; accent-color: var(--train-accent);" onchange="toggleTrainReturnDate(true)" />
+                            <span>Vé Khứ Hồi (2 Chiều)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <label class="form-label">Ga xuất phát (Ga đi) <span class="required">*</span></label>
+                            <select name="departureStationId" id="depStationSelect" class="form-select" required>
+                                <option value="">-- Chọn Ga đi --</option>
+                                <option th:each="st : ${stations}" th:value="${st.id}" 
+                                        th:text="${st.stationName + ' (Km ' + st.distanceKm + ')'}"
+                                        th:selected="${st.id == searchDto.departureStationId}"></option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Ga đến <span class="required">*</span></label>
+                            <select name="arrivalStationId" id="arrStationSelect" class="form-select" required>
+                                <option value="">-- Chọn Ga đến --</option>
+                                <option th:each="st : ${stations}" th:value="${st.id}" 
+                                        th:text="${st.stationName + ' (Km ' + st.distanceKm + ')'}"
+                                        th:selected="${st.id == searchDto.arrivalStationId}"></option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Ngày khởi hành (Đi) <span class="required">*</span></label>
+                            <input type="date" name="departureDate" id="departureDateInput" th:value="${searchDto.departureDate}" class="form-control" required />
+                        </div>
+                        <div id="trainReturnDateGroup" th:style="${searchDto.roundTrip ? 'display: block;' : 'display: none;'}">
+                            <label class="form-label" style="color: var(--train-accent); font-weight: 700;">Ngày về (Khứ hồi) <span class="required">*</span></label>
+                            <input type="date" name="returnDate" id="returnDateInput" th:value="${searchDto.returnDate}" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-train">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                            Tìm Chuyến Tàu
+                        </button>
+                        <button type="button" id="swapStationsBtn" class="btn btn-secondary btn-sm" onclick="swapTrainStations()" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-full);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m7 16 5 5 5-5"/><path d="M12 21V3"/><path d="m17 8-5-5-5 5"/></svg>
+                            <span>Đảo Chiều Ga</span>
+                        </button>
+                        <a href="/trains" class="btn btn-secondary btn-sm">Xem tất cả lịch tàu</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TRƯỜNG HỢP 1: TÌM KIẾM MỘT CHIỀU (!searchDto.roundTrip) -->
+            <!-- ============================================================ -->
+            <div th:if="${!searchDto.roundTrip}">
+                <!-- RESULTS HEADER -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 style="font-size: 19px; font-weight: 700; color: var(--text-primary); margin: 0;">
+                            <span th:if="${depStation != null and arrStation != null}">
+                                Chuyến Tàu Một Chiều: <span th:text="${depStation.stationName + ' &rarr; ' + arrStation.stationName}">Ga Hà Nội &rarr; Ga Sài Gòn</span>
+                            </span>
+                            <span th:if="${depStation == null or arrStation == null}">
+                                Danh Sách Chuyến Tàu Sẵn Sàng
+                            </span>
+                        </h2>
+                        <small style="color: var(--text-secondary);" th:if="${depStation != null and arrStation != null}">
+                            Cự ly chặng: <strong style="color: var(--train-accent);" th:text="${#numbers.formatDecimal(distanceKm, 0, 'COMMA', 0, 'POINT') + ' km'}">1,726 km</strong> &bull;
+                            Ngày đi: <strong th:text="${#temporals.format(searchDto.departureDate, 'dd/MM/yyyy')}">01/11/2026</strong>
+                        </small>
+                    </div>
+                    <span class="badge badge-warning" th:text="${#lists.size(trains)} + ' đoàn tàu sẵn sàng'"></span>
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div th:if="${#lists.isEmpty(trains)}" class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+                    </div>
+                    <div class="empty-title">Không tìm thấy đoàn tàu phù hợp</div>
+                    <p class="empty-desc">Không có đoàn tàu nào khớp với chặng hoặc ngày bạn chọn. Vui lòng thử chọn ngày khác hoặc đổi ga.</p>
+                    <a href="/trains" class="btn btn-train btn-sm">Xem tất cả lịch tàu</a>
+                </div>
+
+                <!-- ONE-WAY TRAIN CARDS -->
+                <div th:if="${not #lists.isEmpty(trains)}" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div th:each="t : ${trains}" class="card card-hover" style="border-radius: var(--radius-lg); padding: 20px 24px;">
+                        <div style="display: grid; grid-template-columns: 2fr 3fr 2fr 1.5fr; gap: 20px; align-items: center;" class="train-grid-row">
+                            
+                            <!-- TRAIN INFO -->
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+                                <div style="flex-shrink: 0; width: 68px; height: 48px; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fffbeb; border: 1px solid #fef3c7; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                                    <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="badge badge-warning" style="font-size: 15px; font-weight: 800; padding: 4px 10px;" th:text="${t.trainCode}">SE1</span>
+                                        <span style="font-size: 15px; font-weight: 700; color: var(--text-primary);" th:text="${t.routeName}">Hà Nội - Sài Gòn</span>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                        Đường sắt Thống Nhất Quốc Gia
+                                    </div>
+                                    <div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;">
+                                        <span class="badge" style="background: #fffbeb; color: #78350f; border: 1px solid #fde68a; font-size: 12px; font-weight: 600;">Ghế Mềm</span>
+                                        <span class="badge" style="background: #fffbeb; color: #78350f; border: 1px solid #fde68a; font-size: 12px; font-weight: 600;">Giường K6</span>
+                                        <span class="badge" style="background: #fffbeb; color: #78350f; border: 1px solid #fde68a; font-size: 12px; font-weight: 600;">Giường K4 VIP</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TIMING -->
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);" th:text="${t.departureTimeOfDay}">06:00</div>
+                                        <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${depStation != null ? depStation.stationName : t.departureStationName}">Ga Hà Nội</div>
+                                        <small style="color: var(--text-muted);" th:text="${depStation != null ? 'Km ' + depStation.distanceKm : 'Km 0'}">Km 0</small>
+                                    </div>
+
+                                    <div style="flex: 1; text-align: center; position: relative;">
+                                        <small style="font-size: 11px; color: var(--train-accent); display: block; font-weight: 700;" th:text="${t.travelHours + ' tiếng hành trình'}">31 tiếng</small>
+                                        <div class="route-line" style="margin: 6px 0; border-top: 2px dashed #f59e0b;"></div>
+                                        <small style="font-size: 11px; color: var(--text-muted);" th:text="${#temporals.format(searchDto.departureDate, 'dd/MM/yyyy')}">01/11/2026</small>
+                                    </div>
+
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Đến Ga</div>
+                                        <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);" th:text="${arrStation != null ? arrStation.stationName : t.arrivalStationName}">Ga Sài Gòn</div>
+                                        <small style="color: var(--text-muted);" th:text="${arrStation != null ? 'Km ' + arrStation.distanceKm : 'Km 1726'}">Km 1726</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PRICE PREVIEW -->
+                            <div style="font-size: 12px; line-height: 1.7; background: #fffbeb; padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid #fef3c7;">
+                                <div style="font-weight: 700; color: #92400e; margin-bottom: 2px;">Giá vé theo chặng:</div>
+                                <div style="display: flex; justify-content: space-between; gap: 8px;">
+                                    <span style="color: var(--text-secondary);">Ghế mềm:</span>
+                                    <strong style="color: var(--text-primary);" th:text="${#numbers.formatDecimal(distanceKm * 700, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,208,200 đ</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; gap: 8px;">
+                                    <span style="color: var(--text-secondary);">Giường K6:</span>
+                                    <strong style="color: var(--text-primary);" th:text="${#numbers.formatDecimal(distanceKm * 1000, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,726,000 đ</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; gap: 8px;">
+                                    <span style="color: var(--text-secondary);">Giường K4 VIP:</span>
+                                    <strong style="color: #b45309;" th:text="${#numbers.formatDecimal(distanceKm * 1300, 0, 'COMMA', 0, 'POINT') + ' đ'}">2,243,800 đ</strong>
+                                </div>
+                            </div>
+
+                            <!-- ACTION BUTTON -->
+                            <div style="text-align: right;">
+                                <a th:href="@{'/trains/' + ${t.id} + '/select-coach' + '?depStationId=' + ${depStation != null ? depStation.id : 1} + '&arrStationId=' + ${arrStation != null ? arrStation.id : 11} + '&depDate=' + ${searchDto.departureDate}}" 
+                                   class="btn btn-train btn-block" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 14px; border-radius: var(--radius-md); font-weight: 700; text-decoration: none;">
+                                    <span>Xem Sơ Đồ &amp; Chọn Chỗ</span>
+                                    <span>&rarr;</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TRƯỜNG HỢP 2: TÌM KIẾM KHỨ HỒI (searchDto.roundTrip == true) -->
+            <!-- ============================================================ -->
+            <div th:if="${searchDto.roundTrip}">
+
+                <!-- BƯỚC 1: CHỌN CHIỀU ĐI -->
+                <div style="margin-bottom: 36px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge badge-warning">Bước 1 / 2</span>
+                                <h2 style="font-size: 20px; font-weight: 800; color: #b45309; margin: 0;">
+                                    🚆 Chọn Đoàn Tàu Chiều Đi
+                                </h2>
+                            </div>
+                            <small style="color: var(--text-secondary);" th:text="${(depStation != null ? depStation.stationName : 'Ga đi') + ' &rarr; ' + (arrStation != null ? arrStation.stationName : 'Ga đến') + ' (Ngày đi: ' + #temporals.format(searchDto.departureDate, 'dd/MM/yyyy') + ')'}"></small>
+                        </div>
+                        <span class="badge badge-warning" th:text="${#lists.size(trains)} + ' đoàn tàu sẵn sàng'"></span>
+                    </div>
+
+                    <!-- EMPTY OUTBOUND -->
+                    <div th:if="${#lists.isEmpty(trains)}" class="empty-state" style="padding: 24px;">
+                        <div class="empty-title">Không tìm thấy đoàn tàu chiều đi phù hợp</div>
+                        <p class="empty-desc">Vui lòng điều chỉnh ngày đi hoặc ga khởi hành.</p>
+                    </div>
+
+                    <!-- OUTBOUND TRAIN LIST -->
+                    <div th:if="${not #lists.isEmpty(trains)}" style="display: flex; flex-direction: column; gap: 14px;">
+                        <div th:each="t, tStat : ${trains}" 
+                             class="card card-hover train-roundtrip-card outbound-card"
+                             th:id="'outbound-card-' + ${t.id}"
+                             th:data-id="${t.id}"
+                             th:data-code="${t.trainCode}"
+                             th:data-time="${t.departureTimeOfDay}"
+                             th:data-price="${distanceKm * 700}"
+                             style="border-radius: var(--radius-lg); padding: 18px 22px; cursor: pointer; transition: all 0.2s;"
+                             onclick="selectOutboundTrain(this)">
+                            <div style="display: grid; grid-template-columns: 40px 2fr 3fr 2fr; gap: 16px; align-items: center;" class="train-grid-row">
+                                <div>
+                                    <input type="radio" name="roundTripOutboundRadio" th:value="${t.id}" th:id="'radio-out-' + ${t.id}" th:checked="${tStat.first}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--train-accent);" />
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 50px; height: 38px; border-radius: 4px; overflow: hidden; background: #fffbeb; display: flex; align-items: center; justify-content: center; border: 1px solid #fef3c7;">
+                                        <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 17px; font-weight: 800; color: #b45309;" th:text="${t.trainCode}">SE1</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);" th:text="${t.routeName}">Hà Nội - Sài Gòn</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div>
+                                            <strong style="font-size: 16px;" th:text="${t.departureTimeOfDay}">06:00</strong>
+                                            <div style="font-size: 12px; color: var(--text-secondary);" th:text="${depStation != null ? depStation.stationName : t.departureStationName}">Ga Hà Nội</div>
+                                        </div>
+                                        <div style="flex: 1; text-align: center;">
+                                            <small style="font-size: 10px; color: var(--train-accent); font-weight: 700;" th:text="${t.travelHours + 'h'}">31h</small>
+                                            <div class="route-line" style="margin: 2px 0; border-top: 2px dashed #f59e0b;"></div>
+                                        </div>
+                                        <div>
+                                            <strong style="font-size: 16px;">Đến Ga</strong>
+                                            <div style="font-size: 12px; color: var(--text-secondary);" th:text="${arrStation != null ? arrStation.stationName : t.arrivalStationName}">Ga Sài Gòn</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <small style="font-size: 11px; color: var(--text-muted); display: block;">Từ (Ghế mềm)</small>
+                                    <div style="font-size: 18px; font-weight: 800; color: var(--accent);" th:text="${#numbers.formatDecimal(distanceKm * 700, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,208,200 đ</div>
+                                    <small style="color: var(--text-muted); font-size: 11px;">Giường nằm: từ <span th:text="${#numbers.formatDecimal(distanceKm * 1000, 0, 'COMMA', 0, 'POINT') + ' đ'}"></span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 2: CHỌN CHIỀU VỀ -->
+                <div style="margin-bottom: 40px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge badge-accent">Bước 2 / 2</span>
+                                <h2 style="font-size: 20px; font-weight: 800; color: var(--accent); margin: 0;">
+                                    🚆 Chọn Đoàn Tàu Chiều Về
+                                </h2>
+                            </div>
+                            <small style="color: var(--text-secondary);" th:text="${(arrStation != null ? arrStation.stationName : 'Ga về') + ' &rarr; ' + (depStation != null ? depStation.stationName : 'Ga đến') + ' (Ngày về: ' + #temporals.format(searchDto.returnDate, 'dd/MM/yyyy') + ')'}"></small>
+                        </div>
+                        <span class="badge badge-accent" th:text="${#lists.size(returnTrains)} + ' đoàn tàu sẵn sàng'"></span>
+                    </div>
+
+                    <!-- EMPTY RETURN -->
+                    <div th:if="${#lists.isEmpty(returnTrains)}" class="empty-state" style="padding: 24px;">
+                        <div class="empty-title">Không tìm thấy đoàn tàu chiều về phù hợp</div>
+                        <p class="empty-desc">Không có đoàn tàu chiều về nào khớp với ngày về bạn chọn. Vui lòng chọn ngày về khác trên form tìm kiếm phía trên.</p>
+                    </div>
+
+                    <!-- RETURN TRAIN LIST -->
+                    <div th:if="${not #lists.isEmpty(returnTrains)}" style="display: flex; flex-direction: column; gap: 14px;">
+                        <div th:each="rt, rtStat : ${returnTrains}" 
+                             class="card card-hover train-roundtrip-card return-card"
+                             th:id="'return-card-' + ${rt.id}"
+                             th:data-id="${rt.id}"
+                             th:data-code="${rt.trainCode}"
+                             th:data-time="${rt.departureTimeOfDay}"
+                             th:data-price="${distanceKm * 700}"
+                             style="border-radius: var(--radius-lg); padding: 18px 22px; cursor: pointer; transition: all 0.2s;"
+                             onclick="selectReturnTrain(this)">
+                            <div style="display: grid; grid-template-columns: 40px 2fr 3fr 2fr; gap: 16px; align-items: center;" class="train-grid-row">
+                                <div>
+                                    <input type="radio" name="roundTripReturnRadio" th:value="${rt.id}" th:id="'radio-ret-' + ${rt.id}" th:checked="${rtStat.first}" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent);" />
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 50px; height: 38px; border-radius: 4px; overflow: hidden; background: #fff7ed; display: flex; align-items: center; justify-content: center; border: 1px solid #ffedd5;">
+                                        <img src="/images/airlines/vnr-train.svg" th:src="@{/images/airlines/vnr-train.svg}" alt="VNR" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 17px; font-weight: 800; color: var(--accent);" th:text="${rt.trainCode}">SE2</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);" th:text="${rt.routeName}">Sài Gòn - Hà Nội</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div>
+                                            <strong style="font-size: 16px;" th:text="${rt.departureTimeOfDay}">06:00</strong>
+                                            <div style="font-size: 12px; color: var(--text-secondary);" th:text="${arrStation != null ? arrStation.stationName : rt.departureStationName}">Ga Sài Gòn</div>
+                                        </div>
+                                        <div style="flex: 1; text-align: center;">
+                                            <small style="font-size: 10px; color: var(--accent); font-weight: 700;" th:text="${rt.travelHours + 'h'}">31h</small>
+                                            <div class="route-line" style="margin: 2px 0; border-top: 2px dashed #ea580c;"></div>
+                                        </div>
+                                        <div>
+                                            <strong style="font-size: 16px;">Đến Ga</strong>
+                                            <div style="font-size: 12px; color: var(--text-secondary);" th:text="${depStation != null ? depStation.stationName : rt.arrivalStationName}">Ga Hà Nội</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <small style="font-size: 11px; color: var(--text-muted); display: block;">Từ (Ghế mềm)</small>
+                                    <div style="font-size: 18px; font-weight: 800; color: var(--accent);" th:text="${#numbers.formatDecimal(distanceKm * 700, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,208,200 đ</div>
+                                    <small style="color: var(--text-muted); font-size: 11px;">Giường nằm: từ <span th:text="${#numbers.formatDecimal(distanceKm * 1000, 0, 'COMMA', 0, 'POINT') + ' đ'}"></span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STICKY SUMMARY BOTTOM BAR FOR ROUND TRIP TRAIN BOOKING -->
+                <div id="trainRoundTripStickyBar" style="position: sticky; bottom: 20px; z-index: 100; background: white; border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgba(0,0,0,0.18); border: 2px solid var(--train-accent); padding: 18px 24px; margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--train-accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                                🚆 Vé Tàu Khứ Hồi Đã Chọn
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-primary); display: flex; gap: 14px; flex-wrap: wrap;">
+                                <span>Đi: <strong id="lblOutboundTrain" style="color: #b45309;">--</strong></span>
+                                <span style="color: var(--border-subtle);">|</span>
+                                <span>Về: <strong id="lblReturnTrain" style="color: var(--accent);">--</strong></span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <div style="text-align: right;">
+                                <small style="font-size: 11px; color: var(--text-muted); display: block;">Ước tính vé khứ hồi / khách từ</small>
+                                <div id="lblTrainTotalPrice" style="font-size: 22px; font-weight: 800; color: var(--accent);">0 đ</div>
+                            </div>
+                            <button type="button" id="btnBookTrainRoundTrip" class="btn btn-cta btn-lg" onclick="submitTrainRoundTripBooking()" style="padding: 12px 28px;">
+                                Tiếp Tục Chọn Chỗ Ngồi (Khứ Hồi) &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const depStationId = /*[[${depStation != null ? depStation.id : 1}]]*/ 1;
+        const arrStationId = /*[[${arrStation != null ? arrStation.id : 11}]]*/ 11;
+        const departureDateStr = /*[[${searchDto.departureDate != null ? searchDto.departureDate.toString() : ''}]]*/ '';
+        const returnDateStr = /*[[${searchDto.returnDate != null ? searchDto.returnDate.toString() : ''}]]*/ '';
+        const isRoundTripMode = /*[[${searchDto.roundTrip}]]*/ false;
+
+        function toggleTrainReturnDate(isRoundTrip) {
+            const grp = document.getElementById('trainReturnDateGroup');
+            const inp = document.getElementById('returnDateInput');
+            const depInp = document.getElementById('departureDateInput');
+            if (grp) {
+                grp.style.display = isRoundTrip ? 'block' : 'none';
+                if (!isRoundTrip && inp) inp.value = '';
+                if (isRoundTrip && inp && (!inp.value || (depInp && inp.value < depInp.value))) {
+                    if (depInp && depInp.value) {
+                        const d = new Date(depInp.value);
+                        d.setDate(d.getDate() + 3);
+                        inp.value = d.toISOString().split('T')[0];
+                    }
+                }
+            }
+        }
+
+        function swapTrainStations() {
+            const depSel = document.getElementById('depStationSelect');
+            const arrSel = document.getElementById('arrStationSelect');
+            if (depSel && arrSel) {
+                const temp = depSel.value;
+                depSel.value = arrSel.value;
+                arrSel.value = temp;
+            }
+        }
+
+        function selectOutboundTrain(cardElem) {
+            const id = cardElem.getAttribute('data-id');
+            const radio = document.getElementById('radio-out-' + id);
+            if (radio) {
+                radio.checked = true;
+                updateTrainRoundTripSummary();
+            }
+        }
+
+        function selectReturnTrain(cardElem) {
+            const id = cardElem.getAttribute('data-id');
+            const radio = document.getElementById('radio-ret-' + id);
+            if (radio) {
+                radio.checked = true;
+                updateTrainRoundTripSummary();
+            }
+        }
+
+        function updateTrainRoundTripSummary() {
+            const outRadio = document.querySelector('input[name="roundTripOutboundRadio"]:checked');
+            const retRadio = document.querySelector('input[name="roundTripReturnRadio"]:checked');
+
+            let outCode = '--';
+            let retCode = '--';
+            let outPrice = 0;
+            let retPrice = 0;
+
+            if (outRadio) {
+                const outCard = document.getElementById('outbound-card-' + outRadio.value);
+                if (outCard) {
+                    outCode = 'Tàu ' + outCard.getAttribute('data-code') + ' (' + outCard.getAttribute('data-time') + ')';
+                    outPrice = parseFloat(outCard.getAttribute('data-price') || '0');
+                }
+                document.querySelectorAll('.outbound-card').forEach(c => c.style.borderColor = 'transparent');
+                if (outCard) outCard.style.borderColor = 'var(--train-accent)';
+            }
+
+            if (retRadio) {
+                const retCard = document.getElementById('return-card-' + retRadio.value);
+                if (retCard) {
+                    retCode = 'Tàu ' + retCard.getAttribute('data-code') + ' (' + retCard.getAttribute('data-time') + ')';
+                    retPrice = parseFloat(retCard.getAttribute('data-price') || '0');
+                }
+                document.querySelectorAll('.return-card').forEach(c => c.style.borderColor = 'transparent');
+                if (retCard) retCard.style.borderColor = 'var(--accent)';
+            }
+
+            const lblOut = document.getElementById('lblOutboundTrain');
+            const lblRet = document.getElementById('lblReturnTrain');
+            const lblTotal = document.getElementById('lblTrainTotalPrice');
+            const btn = document.getElementById('btnBookTrainRoundTrip');
+
+            if (lblOut) lblOut.textContent = outCode;
+            if (lblRet) lblRet.textContent = retCode;
+
+            const total = outPrice + retPrice;
+            if (lblTotal) {
+                lblTotal.textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
+            }
+
+            if (btn) {
+                btn.disabled = !(outRadio && retRadio);
+            }
+        }
+
+        function submitTrainRoundTripBooking() {
+            const outRadio = document.querySelector('input[name="roundTripOutboundRadio"]:checked');
+            const retRadio = document.querySelector('input[name="roundTripReturnRadio"]:checked');
+            if (!outRadio || !retRadio) {
+                alert('Vui lòng chọn cả đoàn tàu chiều đi và đoàn tàu chiều về!');
+                return;
+            }
+            const outTrainId = outRadio.value;
+            const retTrainId = retRadio.value;
+            const retDate = document.getElementById('returnDateInput') ? document.getElementById('returnDateInput').value : returnDateStr;
+
+            const targetUrl = '/trains/' + outTrainId + '/select-coach' +
+                '?depStationId=' + depStationId +
+                '&arrStationId=' + arrStationId +
+                '&depDate=' + encodeURIComponent(departureDateStr) +
+                '&returnTrainId=' + retTrainId +
+                '&returnDate=' + encodeURIComponent(retDate);
+
+            window.location.href = targetUrl;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isRoundTripMode) {
+                updateTrainRoundTripSummary();
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

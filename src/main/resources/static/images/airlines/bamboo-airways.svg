@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 50" width="220" height="50">
+  <rect width="220" height="50" rx="8" fill="#004c3f"/>
+  <!-- Bamboo leaf graphic -->
+  <g transform="translate(14, 10)">
+    <path d="M12 2 C18 6, 22 14, 20 22 C14 20, 8 16, 12 2 Z" fill="#22c55e"/>
+    <path d="M6 10 C10 14, 12 20, 10 26 C6 24, 2 20, 6 10 Z" fill="#86efac"/>
+  </g>
+  <!-- Text -->
+  <text x="46" y="26" font-family="'Be Vietnam Pro', sans-serif" font-size="14.5" font-weight="800" fill="#ffffff" letter-spacing="0.5">BAMBOO</text>
+  <text x="120" y="26" font-family="'Be Vietnam Pro', sans-serif" font-size="14.5" font-weight="400" fill="#86efac" letter-spacing="0.5">AIRWAYS</text>
+  <text x="46" y="39" font-family="'Be Vietnam Pro', sans-serif" font-size="8.5" font-weight="600" fill="#a7f3d0" letter-spacing="1">HƠN CẢ MỘT CHUYẾN BAY</text>
+</svg>

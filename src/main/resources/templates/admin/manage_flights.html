@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Chuyến Bay (Admin) - VietTravel Hub</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar-wrapper">
+        <div class="app-container-lg">
+            <nav class="navbar">
+                <a href="/admin" class="nav-brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    </div>
+                    <span>VietTravel Hub &bull; Quản Trị</span>
+                </a>
+                <div class="nav-actions">
+                    <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard Quản Trị</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content" style="padding-top: 26px;">
+        <div class="app-container-lg">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                        Quản Lý Danh Mục Chuyến Bay
+                    </h1>
+                    <small style="color: var(--text-secondary);">Thêm mới và kiểm soát toàn bộ chuyến bay trong cơ sở dữ liệu hệ thống</small>
+                </div>
+                <span class="badge badge-primary">Chỉ dành cho ADMIN</span>
+            </div>
+
+            <!-- SUCCESS ALERT -->
+            <div th:if="${successMessage != null}" class="alert alert-success">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <div th:text="${successMessage}">Thao tác thành công</div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="card" style="margin-bottom: 30px; border-radius: var(--radius-lg); border-top: 4px solid var(--primary);">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                        Thêm Chuyến Bay Mới
+                    </div>
+                </div>
+
+                <form method="post" th:action="@{/admin/flights}" th:object="${newFlight}" data-protect>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Số hiệu chuyến bay <span class="required">*</span></label>
+                            <input type="text" th:field="*{flightNumber}" class="form-control" placeholder="VN-999" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hãng hàng không <span class="required">*</span></label>
+                            <input type="text" th:field="*{airline}" class="form-control" placeholder="Vietnam Airlines" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã sân bay đi <span class="required">*</span></label>
+                            <input type="text" th:field="*{departureAirport}" class="form-control" placeholder="HAN" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Thành phố đi <span class="required">*</span></label>
+                            <input type="text" th:field="*{departureCity}" class="form-control" placeholder="Hà Nội" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã sân bay đến <span class="required">*</span></label>
+                            <input type="text" th:field="*{arrivalAirport}" class="form-control" placeholder="SGN" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Thành phố đến <span class="required">*</span></label>
+                            <input type="text" th:field="*{arrivalCity}" class="form-control" placeholder="TP. Hồ Chí Minh" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giờ cất cánh <span class="required">*</span></label>
+                            <input type="datetime-local" th:field="*{departureTime}" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giờ hạ cánh <span class="required">*</span></label>
+                            <input type="datetime-local" th:field="*{arrivalTime}" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giá vé cơ bản (VNĐ) <span class="required">*</span></label>
+                            <input type="number" th:field="*{basePrice}" class="form-control" placeholder="1200000" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số ghế phổ thông (Eco Total) <span class="required">*</span></label>
+                            <input type="number" th:field="*{economySeatsTotal}" class="form-control" placeholder="150" required />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        Lưu Chuyến Bay Mới &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <!-- TABLE CARD -->
+            <div class="card" style="border-radius: var(--radius-lg); padding: 0; overflow: hidden;">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-alt);">
+                    <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">
+                        Danh Sách Chuyến Bay Trong Hệ Thống
+                    </div>
+                </div>
+                <div class="table-responsive" style="border: none;">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Số hiệu</th>
+                                <th>Hãng bay</th>
+                                <th>Chặng bay</th>
+                                <th>Khởi hành</th>
+                                <th>Hạ cánh</th>
+                                <th>Giá cơ bản</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="f : ${flights}">
+                                <td th:text="${f.id}"></td>
+                                <td><strong style="color: var(--primary);" th:text="${f.flightNumber}"></strong></td>
+                                <td th:text="${f.airline}"></td>
+                                <td>
+                                    <span th:text="${f.departureAirport + ' (' + f.departureCity + ')'}"></span> &rarr;
+                                    <span th:text="${f.arrivalAirport + ' (' + f.arrivalCity + ')'}"></span>
+                                </td>
+                                <td th:text="${#temporals.format(f.departureTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(f.arrivalTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td><strong style="color: var(--accent);" th:text="${#numbers.formatDecimal(f.basePrice, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong></td>
+                                <td><span class="badge badge-success" th:text="${f.status}">ACTIVE</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <div class="app-container-lg footer-inner">
+            <div>VietTravel Hub &copy; 2026. Quản trị hệ thống.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

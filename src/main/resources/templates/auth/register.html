@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tài Khoản - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body class="auth-body">
+
+<div class="auth-split-card" style="max-width: 1080px;">
+
+    <!-- LEFT VISUAL BRANDING COLUMN -->
+    <div class="auth-visual-side" th:style="'background-image: url(' + @{/images/banners/hero-travel.jpg} + ');'">
+        <div>
+            <a href="/" class="auth-visual-brand">
+                <div class="brand-icon" style="width: 44px; height: 44px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                </div>
+                <span>VietTravel Hub</span>
+            </a>
+            <div>
+                <span class="auth-badge-tag">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    Chương Trình Hội Viên Thân Thiết
+                </span>
+            </div>
+
+            <div style="margin-top: 30px; margin-bottom: 26px;">
+                <h2 style="font-size: 26px; font-weight: 800; line-height: 1.35; margin-bottom: 12px; color: #ffffff;">
+                    Gia Nhập Cộng Đồng Du Lịch VietTravel Hub
+                </h2>
+                <p style="font-size: 14px; color: rgba(255, 255, 255, 0.85); line-height: 1.6; margin: 0;">
+                    Tạo tài khoản chỉ trong 1 phút để mở khóa những tiện ích đặt vé cao cấp và nhận các ưu đãi hấp dẫn dành riêng cho thành viên.
+                </p>
+            </div>
+
+            <!-- PERKS -->
+            <div class="auth-perk-card">
+                <div class="auth-perk-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><circle cx="18" cy="12" r="2"/></svg>
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 13.5px; color: #ffffff; margin-bottom: 2px;">Tích lũy dặm thưởng cho mọi chuyến đi</strong>
+                    <span style="font-size: 12.5px; color: rgba(255, 255, 255, 0.8);">Mỗi vé máy bay và tàu hỏa đều tích điểm đổi coupon giảm giá trực tiếp.</span>
+                </div>
+            </div>
+
+            <div class="auth-perk-card">
+                <div class="auth-perk-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 13.5px; color: #ffffff; margin-bottom: 2px;">Tự động lưu thông tin hành khách</strong>
+                    <span style="font-size: 12.5px; color: rgba(255, 255, 255, 0.8);">Điền sẵn tên, số điện thoại, CCCD/Hộ chiếu khi đặt vé lần sau, không mất công nhập lại.</span>
+                </div>
+            </div>
+
+            <div class="auth-perk-card">
+                <div class="auth-perk-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 13.5px; color: #ffffff; margin-bottom: 2px;">Nhận vé điện tử qua Gmail tức thì</strong>
+                    <span style="font-size: 12.5px; color: rgba(255, 255, 255, 0.8);">Hệ thống tự động gửi xác nhận và mã vé điện tử ngay khi bạn hoàn tất đặt chỗ.</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="auth-partner-strip">
+                <span class="auth-partner-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    Vietnam Airlines
+                </span>
+                <span class="auth-partner-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    Vietjet Air
+                </span>
+                <span class="auth-partner-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    Bamboo Airways
+                </span>
+                <span class="auth-partner-chip">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><circle cx="8" cy="15" r="1.5"/><circle cx="16" cy="15" r="1.5"/></svg>
+                    Đường Sắt VN
+                </span>
+            </div>
+
+            <div style="margin-top: 14px; font-size: 12px; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; justify-content: space-between;">
+                <span>★ 4.9/5 xếp hạng tin cậy</span>
+                <span>Cam kết bảo mật dữ liệu khách hàng</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT FORM COLUMN -->
+    <div class="auth-form-side">
+
+        <div class="auth-form-header">
+            <h1 class="auth-form-title">Đăng Ký Khách Hàng ✨</h1>
+            <p class="auth-form-desc">Tạo tài khoản để theo dõi vé và nhận ưu đãi hành trình</p>
+        </div>
+
+        <form method="post" th:action="@{/register}" th:object="${user}" id="registerForm" data-protect autocomplete="off">
+            <!-- Hidden inputs to intercept aggressive browser credential autofill -->
+            <input type="text" name="fake_user_trap" style="position: absolute; top: -9999px; left: -9999px;" tabindex="-1" autocomplete="off" />
+            <input type="password" name="fake_pass_trap" style="position: absolute; top: -9999px; left: -9999px;" tabindex="-1" autocomplete="new-password" />
+
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label class="form-label" for="username">Tên đăng nhập <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+                    </span>
+                    <input type="text" id="username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''" placeholder="Ví dụ: nguyenvana" autocomplete="off" required />
+                </div>
+                <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="form-error"></div>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label class="form-label" for="password">Mật khẩu <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </span>
+                    <input type="password" id="password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''" placeholder="Tối thiểu 6 ký tự bảo mật" autocomplete="new-password" required />
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" title="Hiện / Ẩn mật khẩu" aria-label="Hiện / Ẩn mật khẩu">
+                        <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-closed" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="form-error"></div>
+            </div>
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Xác nhận mật khẩu <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </span>
+                    <input type="password" id="confirmPassword" name="confirmPassword" th:value="${confirmPassword}" class="form-control" th:classappend="${confirmPasswordError != null} ? 'is-invalid' : ''" placeholder="Nhập lại mật khẩu để tránh gõ nhầm" autocomplete="new-password" required />
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword', this)" title="Hiện / Ẩn mật khẩu xác nhận" aria-label="Hiện / Ẩn mật khẩu xác nhận">
+                        <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-closed" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+                <div id="passwordMatchHint" style="font-size: 12px; margin-top: 5px; display: none;"></div>
+                <div th:if="${confirmPasswordError != null}" class="form-error" th:text="${confirmPasswordError}"></div>
+            </div>
+
+            <!-- FULL NAME -->
+            <div class="form-group">
+                <label class="form-label" for="fullName">Họ và tên đầy đủ <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
+                    <input type="text" id="fullName" th:field="*{fullName}" class="form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" placeholder="Ví dụ: Nguyễn Văn An" autocomplete="off" required />
+                </div>
+                <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="form-error"></div>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label class="form-label" for="email">Địa chỉ Email <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </span>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''" placeholder="Ví dụ: an.nguyen@example.com" autocomplete="off" required />
+                </div>
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="form-error"></div>
+            </div>
+
+            <!-- PHONE -->
+            <div class="form-group">
+                <label class="form-label" for="phone">Số điện thoại di động <span class="required">*</span></label>
+                <div class="input-with-icon">
+                    <span class="input-icon-left">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </span>
+                    <input type="tel" id="phone" th:field="*{phone}" class="form-control" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''" placeholder="Ví dụ: 0912345678" autocomplete="off" required />
+                </div>
+                <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="form-error"></div>
+            </div>
+
+            <!-- MANDATORY TERMS & PRIVACY CHECKBOX -->
+            <div class="form-group" style="margin-top: 14px; margin-bottom: 20px;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; user-select: none; font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" value="true" th:checked="${agreeTerms != null and agreeTerms}" required style="width: 18px; height: 18px; accent-color: var(--primary); margin-top: 2px; cursor: pointer;" />
+                    <span>
+                        Tôi đồng ý với 
+                        <a href="javascript:void(0)" onclick="openTermsModal('terms')" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Điều khoản sử dụng</a> 
+                        và 
+                        <a href="javascript:void(0)" onclick="openTermsModal('privacy')" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Chính sách bảo mật</a> 
+                        <span class="required">*</span>
+                    </span>
+                </label>
+                <div th:if="${agreeTermsError != null}" class="form-error" style="margin-top: 6px;" th:text="${agreeTermsError}"></div>
+            </div>
+
+            <button type="submit" id="btnSubmitRegister" class="btn btn-cta btn-block btn-lg" style="margin-top: 14px; font-weight: 700;">
+                <span>Hoàn Tất Đăng Ký</span>
+                <span style="font-size: 18px;">&rarr;</span>
+            </button>
+        </form>
+
+        <div style="margin-top: 22px; text-align: center; font-size: 13.5px; color: var(--text-secondary);">
+            Đã có tài khoản? 
+            <a href="/login" style="font-weight: 700; color: var(--primary); text-decoration: underline;">Đăng nhập ngay</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 13px;">
+            <a href="/" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                <span>&larr;</span> Quay về Trang chủ
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TERMS & PRIVACY MODAL -->
+<div id="termsModalOverlay" class="modal-overlay" onclick="closeTermsModalOnBackdrop(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="modalTitle" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">Điều Khoản Sử Dụng</h3>
+            <button type="button" onclick="closeTermsModal()" style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 22px; line-height: 1; padding: 4px 8px; border-radius: 6px;">&times;</button>
+        </div>
+        <div id="modalBody" class="modal-body">
+            <!-- Dynamic content loaded via JS -->
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm" onclick="closeTermsModal()">Đã Hiểu &amp; Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// If freshly opened without server errors, actively clear any browser-autofilled credentials
+document.addEventListener('DOMContentLoaded', function() {
+    var hasServerErrors = document.querySelector('.form-error') !== null;
+    if (!hasServerErrors) {
+        var userStartedTyping = false;
+        ['keydown', 'input'].forEach(function(eName) {
+            document.addEventListener(eName, function() { userStartedTyping = true; }, { once: true });
+        });
+
+        function clearBrowserAutofill() {
+            if (userStartedTyping) return;
+            var u = document.getElementById('username');
+            var p = document.getElementById('password');
+            var cp = document.getElementById('confirmPassword');
+            if (u && (u.value === 'admin' || u.value === 'nhanvien' || u.value === 'khachhang' || !u.value.trim())) {
+                u.value = '';
+            }
+            if (p) p.value = '';
+            if (cp) cp.value = '';
+        }
+
+        clearBrowserAutofill();
+        setTimeout(clearBrowserAutofill, 50);
+        setTimeout(clearBrowserAutofill, 150);
+        setTimeout(clearBrowserAutofill, 400);
+    }
+
+    // Live password match feedback
+    var passwordInput = document.getElementById('password');
+    var confirmPasswordInput = document.getElementById('confirmPassword');
+    var matchHint = document.getElementById('passwordMatchHint');
+
+    function checkPasswordMatch() {
+        if (!passwordInput || !confirmPasswordInput || !matchHint) return;
+        var pVal = passwordInput.value;
+        var cpVal = confirmPasswordInput.value;
+
+        if (!cpVal) {
+            matchHint.style.display = 'none';
+            confirmPasswordInput.style.borderColor = '';
+            return;
+        }
+
+        matchHint.style.display = 'block';
+        if (pVal === cpVal) {
+            matchHint.style.color = 'var(--success)';
+            matchHint.innerHTML = '&#10003; Mật khẩu xác nhận trùng khớp';
+            confirmPasswordInput.style.borderColor = 'var(--success)';
+        } else {
+            matchHint.style.color = 'var(--danger)';
+            matchHint.innerHTML = '&#10005; Mật khẩu xác nhận chưa khớp với mật khẩu đã nhập';
+            confirmPasswordInput.style.borderColor = 'var(--danger)';
+        }
+    }
+
+    if (passwordInput && confirmPasswordInput) {
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    }
+
+    // Form submission validation
+    var regForm = document.getElementById('registerForm');
+    if (regForm) {
+        regForm.addEventListener('submit', function(e) {
+            var pVal = passwordInput.value;
+            var cpVal = confirmPasswordInput.value;
+            var agree = document.getElementById('agreeTerms');
+
+            if (pVal !== cpVal) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không trùng khớp! Vui lòng kiểm tra lại.');
+                confirmPasswordInput.focus();
+                return false;
+            }
+
+            if (agree && !agree.checked) {
+                e.preventDefault();
+                alert('Vui lòng tích chọn đồng ý với Điều khoản sử dụng và Chính sách bảo mật để tiếp tục.');
+                agree.focus();
+                return false;
+            }
+        });
+    }
+});
+
+function togglePasswordVisibility(id, btn) {
+    var input = document.getElementById(id);
+    if (!input) return;
+    var eyeOpen = btn.querySelector('.eye-open');
+    var eyeClosed = btn.querySelector('.eye-closed');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'block';
+    } else {
+        input.type = 'password';
+        if (eyeOpen) eyeOpen.style.display = 'block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
+    }
+}
+
+// Terms & Privacy Modal Logic
+var modalData = {
+    terms: {
+        title: 'Điều Khoản Sử Dụng - VietTravel Hub',
+        body: `
+            <p><strong>1. Quyền và Trách nhiệm của Khách hàng:</strong></p>
+            <p>- Khách hàng cung cấp thông tin trung thực, chính xác khi đăng ký tài khoản và đặt vé (bao gồm Họ tên, Số điện thoại, CCCD/Hộ chiếu theo đúng giấy tờ tùy thân).</p>
+            <p>- Bạn chịu trách nhiệm bảo mật mật khẩu tài khoản và thông báo ngay cho VietTravel Hub nếu phát hiện truy cập trái phép.</p>
+            
+            <p><strong>2. Quy định Đặt chỗ & Thanh toán vé:</strong></p>
+            <p>- Khi đặt vé máy bay hoặc vé tàu hỏa, quý khách có 15 phút giữ chỗ tạm thời để hoàn tất xác nhận thanh toán.</p>
+            <p>- Vé điện tử hợp lệ sẽ được chuyển về địa chỉ Gmail quý khách đã đăng ký ngay sau khi trạng thái đơn vé chuyển sang Đã xuất vé.</p>
+            
+            <p><strong>3. Đổi vé & Hủy vé:</strong></p>
+            <p>- Mọi yêu cầu đổi ngày giờ hoặc hủy vé tuân theo chính sách hoàn/hủy công khai của từng Hãng hàng không (Vietnam Airlines, Vietjet Air, Bamboo Airways) hoặc Đường sắt Việt Nam.</p>
+        `
+    },
+    privacy: {
+        title: 'Chính Sách Bảo Mật Thông Tin - VietTravel Hub',
+        body: `
+            <p><strong>1. Mục đích thu thập dữ liệu cá nhân:</strong></p>
+            <p>- Dữ liệu khách hàng (Họ tên, Email, Số điện thoại, Thông tin chuyến đi) được thu thập chỉ nhằm mục đích xuất vé điện tử, liên hệ hỗ trợ hành trình và thông báo giờ khởi hành.</p>
+            
+            <p><strong>2. Cam kết bảo mật tuyệt đối:</strong></p>
+            <p>- Mật khẩu thành viên được mã hóa an toàn theo tiêu chuẩn BCrypt một chiều.</p>
+            <p>- VietTravel Hub cam kết không bán, không thương mại hóa dữ liệu cá nhân cho bất kỳ bên thứ ba nào ngoại trừ các cơ quan chức năng hoặc đối tác vận tải trực tiếp khi xuất vé theo quy định pháp luật.</p>
+            
+            <p><strong>3. Quyền chỉnh sửa và xóa thông tin:</strong></p>
+            <p>- Khách hàng có toàn quyền cập nhật thông tin cá nhân hoặc yêu cầu khóa tài khoản bất cứ lúc nào thông qua trang Quản lý tài khoản.</p>
+        `
+    }
+};
+
+function openTermsModal(type) {
+    var data = modalData[type] || modalData.terms;
+    document.getElementById('modalTitle').innerText = data.title;
+    document.getElementById('modalBody').innerHTML = data.body;
+    document.getElementById('termsModalOverlay').classList.add('active');
+}
+
+function closeTermsModal() {
+    document.getElementById('termsModalOverlay').classList.remove('active');
+}
+
+function closeTermsModalOnBackdrop(e) {
+    if (e.target.id === 'termsModalOverlay') {
+        closeTermsModal();
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeTermsModal();
+    }
+});
+</script>
+
+</body>
+</html>

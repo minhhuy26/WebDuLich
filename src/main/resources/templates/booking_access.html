@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực đơn vé - VietTravel Hub</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('none')}"></header>
+
+    <main class="main-content" style="padding-top: 50px;">
+    <div class="app-container-sm" style="max-width: 520px;">
+        <section class="card" style="padding: 32px;">
+            <h1 style="font-size: 24px; margin-bottom: 10px;">Xác thực đơn vé</h1>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+                Để bảo vệ thông tin hành khách, hãy nhập số điện thoại đã dùng để đặt
+                <span th:text="${ticketLabel}">vé</span> có mã
+                <strong th:text="${bookingCode}">MÃ ĐƠN</strong>.
+            </p>
+            <form method="get" th:action="${lookupAction}">
+                <label for="phone" class="form-label">Số điện thoại đặt vé</label>
+                <input id="phone" name="phone" type="tel" class="form-control"
+                       inputmode="numeric" autocomplete="tel" pattern="0[0-9]{9,10}"
+                       placeholder="Ví dụ: 0912345678" required>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                    Xác thực và xem đơn vé
+                </button>
+            </form>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 18px 0 0; text-align: center;">
+                Nếu không còn số điện thoại, vui lòng liên hệ bộ phận hỗ trợ.
+            </p>
+        </section>
+    </div>
+</main>
+</body>
+</html>
