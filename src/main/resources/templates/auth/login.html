@@ -166,18 +166,22 @@
                 </span>
                 <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(Click để điền tự động)</span>
             </div>
-            <div class="quick-creds-grid">
+            <div class="quick-creds-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
                 <div class="quick-creds-pill" onclick="fillCreds('admin', 'admin123')">
-                    <span class="quick-creds-role" style="color: var(--danger);">Quản trị</span>
+                    <span class="quick-creds-role" style="color: var(--danger);">Admin</span>
                     <span class="quick-creds-user">admin</span>
                 </div>
-                <div class="quick-creds-pill" onclick="fillCreds('nhanvien', 'nhanvien123')">
-                    <span class="quick-creds-role" style="color: var(--primary);">Nhân viên</span>
-                    <span class="quick-creds-user">nhanvien</span>
+                <div class="quick-creds-pill" onclick="fillCreds('operator_mai', 'operator123')">
+                    <span class="quick-creds-role" style="color: var(--primary);">Điều hành</span>
+                    <span class="quick-creds-user">operator_mai</span>
                 </div>
-                <div class="quick-creds-pill" onclick="fillCreds('khachhang', 'khach123')">
-                    <span class="quick-creds-role" style="color: var(--success);">Khách hàng</span>
-                    <span class="quick-creds-user">khachhang</span>
+                <div class="quick-creds-pill" onclick="fillCreds('agent_saigontour', 'agent123')">
+                    <span class="quick-creds-role" style="color: #7c3aed;">Đại lý</span>
+                    <span class="quick-creds-user">agent_saigontour</span>
+                </div>
+                <div class="quick-creds-pill" onclick="fillCreds('traveler_an', 'traveler123')">
+                    <span class="quick-creds-role" style="color: var(--success);">Du khách</span>
+                    <span class="quick-creds-user">traveler_an</span>
                 </div>
             </div>
         </div>

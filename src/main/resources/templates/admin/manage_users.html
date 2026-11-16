@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Người Dùng &amp; Phân Quyền - VietTravel Hub</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>Quản Lý Người Dùng &amp; Phân Quyền RBAC - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/app.css}">
-    <script th:src="@{/js/app.js}" defer></script>
 </head>
 <body>
 
@@ -18,9 +17,9 @@
             <nav class="navbar">
                 <a href="/admin" class="nav-brand">
                     <div class="brand-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                     </div>
-                    <span>VietTravel Hub &bull; Quản Trị</span>
+                    <span>VietTravel Hub &bull; Quản Trị RBAC</span>
                 </a>
                 <div class="nav-actions">
                     <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard Quản Trị</a>
@@ -29,118 +28,96 @@
         </div>
     </header>
 
-    <main class="main-content" style="padding-top: 26px;">
+    <main class="main-content" style="padding-top: 26px; padding-bottom: 60px;">
         <div class="app-container-lg">
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
                 <div>
-                    <h1 style="font-size: 24px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px;">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        Quản Lý Người Dùng &amp; Phân Quyền
+                    <h1 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 6px 0;">
+                        Quản Lý Người Dùng &amp; Phân Quyền RBAC (Bảng users)
                     </h1>
-                    <small style="color: var(--text-secondary);">Quản trị tài khoản 3 vai trò: KHACH, NHANVIEN, ADMIN với mật khẩu mã hóa BCrypt</small>
+                    <small style="color: var(--text-muted);">Phân quyền 4 vai trò chuẩn theo tài liệu của Giảng viên: ROLE_TRAVELER, ROLE_AGENT, ROLE_OPERATOR, ROLE_ADMIN</small>
                 </div>
-                <span class="badge badge-danger">Chỉ dành cho ADMIN</span>
+                <span class="badge badge-danger">Dành riêng cho ROLE_ADMIN</span>
             </div>
 
             <!-- ALERTS -->
-            <div th:if="${successMessage != null}" class="alert alert-success">
-                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                <div th:text="${successMessage}">Thao tác thành công</div>
-            </div>
-            <div th:if="${errorMessage != null}" class="alert alert-danger">
-                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-                <div th:text="${errorMessage}">Lỗi thao tác</div>
-            </div>
+            <div th:if="${successMessage != null}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage != null}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
             <!-- FORM CARD -->
-            <div class="card" style="margin-bottom: 30px; border-radius: var(--radius-lg); border-top: 4px solid var(--primary-dark);">
-                <div class="card-header">
-                    <div class="card-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                        Thêm Tài Khoản Mới
-                    </div>
-                </div>
+            <div class="card" style="margin-bottom: 30px; border-radius: var(--radius-lg); border-top: 4px solid var(--primary);">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--primary);">
+                    + Tạo Mới Tài Khoản &amp; Phân Quyền
+                </h3>
 
-                <form method="post" th:action="@{/admin/users}" th:object="${newUser}" data-protect>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
-                        <div class="form-group">
-                            <label class="form-label">Tên đăng nhập <span class="required">*</span></label>
-                            <input type="text" th:field="*{username}" class="form-control" placeholder="nhanvien_moi" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Mật khẩu <span class="required">*</span></label>
-                            <input type="password" th:field="*{password}" class="form-control" placeholder="Tối thiểu 6 ký tự" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Họ và tên đầy đủ <span class="required">*</span></label>
-                            <input type="text" th:field="*{fullName}" class="form-control" placeholder="Nguyễn Văn B" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email <span class="required">*</span></label>
-                            <input type="email" th:field="*{email}" class="form-control" placeholder="user@dulich.com" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Số điện thoại</label>
-                            <input type="text" th:field="*{phone}" class="form-control" placeholder="0912345678" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Vai trò (Role) <span class="required">*</span></label>
-                            <select th:field="*{role}" class="form-select">
-                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r.displayName + ' (' + r.name() + ')'}"></option>
-                            </select>
-                        </div>
+                <form method="post" th:action="@{/admin/users/new}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 130px; gap: 14px; align-items: flex-end;">
+                    <div>
+                        <label class="form-label">Tên đăng nhập *</label>
+                        <input type="text" name="username" class="form-control" placeholder="nhanvien_moi" required />
                     </div>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                        Tạo Tài Khoản &rarr;
-                    </button>
+                    <div>
+                        <label class="form-label">Mật khẩu *</label>
+                        <input type="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Họ và tên *</label>
+                        <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Email *</label>
+                        <input type="email" name="email" class="form-control" placeholder="user@dulich.vn" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" name="phone" class="form-control" placeholder="0912345678" />
+                    </div>
+                    <div>
+                        <label class="form-label">Vai trò (Role) *</label>
+                        <select name="role" class="form-select">
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r.displayName + ' (' + r.name() + ')'}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">Tạo User</button>
+                    </div>
                 </form>
             </div>
 
-            <!-- TABLE CARD -->
-            <div class="card" style="border-radius: var(--radius-lg); padding: 0; overflow: hidden;">
-                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--surface-alt);">
-                    <div style="font-weight: 700; font-size: 16px; color: var(--text-primary);">
-                        Danh Sách Tài Khoản Trong Cơ Sở Dữ Liệu
-                    </div>
-                </div>
-                <div class="table-responsive" style="border: none;">
+            <!-- USERS TABLE -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive">
                     <table class="table-custom">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Username</th>
-                                <th>Họ và tên</th>
+                                <th>Tên Đăng Nhập</th>
+                                <th>Họ và Tên</th>
                                 <th>Email</th>
-                                <th>Số điện thoại</th>
-                                <th>Vai trò</th>
-                                <th>Trạng thái</th>
-                                <th style="text-align: right;">Hành động</th>
+                                <th>Số Điện Thoại</th>
+                                <th>Vai Trò (Role)</th>
+                                <th>Trạng Thái</th>
+                                <th>Ngày Tạo</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="u : ${users}">
-                                <td th:text="${u.id}"></td>
-                                <td><code style="font-weight: 700; color: var(--primary);" th:text="${u.username}"></code></td>
-                                <td><strong th:text="${u.fullName}"></strong></td>
-                                <td th:text="${u.email}"></td>
-                                <td th:text="${u.phone ?: '-'}"></td>
+                                <td th:text="${u.id}">1</td>
+                                <td><strong style="font-family: var(--font-mono); color: var(--primary);" th:text="${u.username}">admin</strong></td>
+                                <td th:text="${u.fullName}">Quản Trị Viên</td>
+                                <td th:text="${u.email}">admin@dulich.vn</td>
+                                <td th:text="${u.phone != null ? u.phone : '-'}">-</td>
                                 <td>
-                                    <span class="badge" 
-                                          th:classappend="${u.role.name() == 'ADMIN' ? 'role-admin' : (u.role.name() == 'KHACH' ? 'role-khach' : 'role-nhanvien')}"
-                                          th:text="${u.role.displayName}"></span>
+                                    <span th:if="${u.role.name() == 'ROLE_ADMIN'}" class="badge badge-danger">ROLE_ADMIN</span>
+                                    <span th:if="${u.role.name() == 'ROLE_OPERATOR'}" class="badge badge-primary">ROLE_OPERATOR</span>
+                                    <span th:if="${u.role.name() == 'ROLE_AGENT'}" class="badge badge-warning">ROLE_AGENT</span>
+                                    <span th:if="${u.role.name() == 'ROLE_TRAVELER'}" class="badge badge-neutral">ROLE_TRAVELER</span>
                                 </td>
                                 <td>
                                     <span th:if="${u.status}" class="badge badge-success">Hoạt động</span>
                                     <span th:unless="${u.status}" class="badge badge-danger">Đã khóa</span>
                                 </td>
-                                <td style="text-align: right;">
-                                    <form method="post" th:action="@{'/admin/users/' + ${u.id} + '/toggle-status'}" style="display: inline;">
-                                        <button type="submit" class="btn btn-sm" 
-                                                th:classappend="${u.status ? 'btn-danger-outline' : 'btn-outline'}"
-                                                th:text="${u.status ? 'Khóa' : 'Kích hoạt'}"></button>
-                                    </form>
-                                </td>
+                                <td th:text="${#temporals.format(u.createdAt, 'dd/MM/yyyy HH:mm')}">10/11/2026</td>
                             </tr>
                         </tbody>
                     </table>
@@ -149,13 +126,6 @@
 
         </div>
     </main>
-
-    <!-- FOOTER -->
-    <footer class="app-footer">
-        <div class="app-container-lg footer-inner">
-            <div>VietTravel Hub &copy; 2026. Quản trị hệ thống.</div>
-        </div>
-    </footer>
 
 </body>
 </html>

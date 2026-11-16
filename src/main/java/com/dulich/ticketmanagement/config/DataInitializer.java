@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "app.demo-data.enabled", havingValue = "true")
 public class DataInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
@@ -28,11 +26,12 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        createOrUpdateUser("admin", "admin123", "Quản Trị Viên Hệ Thống", "admin@dulich.com", "0901112222", UserRole.ADMIN);
-        createOrUpdateUser("nhanvien", "nhanvien123", "Nguyễn Thị Mai (Nhân Viên)", "nhanvien@dulich.com", "0903334444", UserRole.NHANVIEN);
-        createOrUpdateUser("khachhang", "khach123", "Trần Văn An (Khách Hàng)", "khachhang@dulich.com", "0912345678", UserRole.KHACH);
+        createOrUpdateUser("admin", "admin123", "Quản Trị Viên Hệ Thống", "admin@dulich.vn", "0901000001", UserRole.ROLE_ADMIN);
+        createOrUpdateUser("operator_mai", "operator123", "Nguyễn Thị Mai (Điều Hành Vé)", "mai.operator@dulich.vn", "0902000002", UserRole.ROLE_OPERATOR);
+        createOrUpdateUser("agent_saigontour", "agent123", "Đại Lý Du Lịch Sài Gòn", "contact@saigontour.vn", "0903000003", UserRole.ROLE_AGENT);
+        createOrUpdateUser("traveler_an", "traveler123", "Trần Văn An (Du Khách)", "an.tran@gmail.com", "0912345678", UserRole.ROLE_TRAVELER);
 
-        log.info("Khởi tạo và cập nhật BCrypt mật khẩu cho 3 tài khoản mẫu thành công!");
+        log.info("Khởi tạo và đồng bộ 4 tài khoản chuẩn RBAC (Admin, Operator, Agent, Traveler) thành công!");
     }
 
     private void createOrUpdateUser(String username, String rawPassword, String fullName, String email, String phone, UserRole role) {
@@ -47,9 +46,8 @@ public class DataInitializer implements CommandLineRunner {
             user.setRole(role);
             user.setStatus(true);
             userRepository.save(user);
-            log.info("Tạo mới tài khoản: {} với vai trò {}", username, role);
+            log.info("Đã tạo mới tài khoản mẫu: {} vai trò {}", username, role);
         } else {
-            // Đảm bảo mật khẩu được băm BCrypt và role đúng
             if (!user.getPassword().startsWith("$2a$") && !user.getPassword().startsWith("$2b$")) {
                 user.setPassword(passwordEncoder.encode(rawPassword));
             }

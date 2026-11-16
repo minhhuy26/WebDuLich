@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Đơn Đặt Vé - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('lookup')}"></header>
+
+    <div class="app-container" style="padding-top: 40px; padding-bottom: 70px; max-width: 860px;">
+
+        <!-- BREADCRUMB -->
+        <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            <a href="/" style="color: var(--primary); text-decoration: none;">Trang chủ</a> / 
+            <strong>Tra cứu đơn đặt chỗ</strong>
+        </nav>
+
+        <!-- FLASH MESSAGES -->
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 20px;" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" class="alert alert-success" style="margin-bottom: 20px;" th:text="${successMessage}"></div>
+
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 52px; height: 52px; background: var(--primary-subtle); color: var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/></svg>
+            </div>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+                Tra Cứu Thông Tin Đơn Đặt Vé &amp; Mã QR
+            </h1>
+            <p style="font-size: 14.5px; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+                Quý khách không cần đăng nhập. Nhập Mã đơn đặt chỗ (ví dụ: <code style="font-family: var(--font-mono); color: var(--primary);">RES-202611-0001</code>) hoặc Số điện thoại để xem tình trạng vé và thanh toán.
+            </p>
+        </div>
+
+        <!-- SEARCH FORM CARD -->
+        <div class="card" style="padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 32px;">
+            <form method="post" th:action="@{/my-bookings/lookup}">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) 140px; gap: 16px; align-items: flex-end;">
+                    <div>
+                        <label class="form-label" style="font-weight: 600;">Mã đơn đặt chỗ (Booking Code)</label>
+                        <input type="text" name="code" th:value="${code}" class="form-control" placeholder="VD: RES-202611-0001" style="font-family: var(--font-mono); font-size: 14px;" />
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-weight: 600;">Hoặc Số điện thoại đặt vé</label>
+                        <input type="tel" name="phone" th:value="${phone}" class="form-control" placeholder="VD: 0912345678" />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 700;">
+                            Tra Cứu ➔
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- SEARCH RESULTS IF PHONE SEARCH -->
+        <div th:if="${foundReservations != null}">
+            <h3 style="font-size: 17px; font-weight: 750; margin-bottom: 16px; color: var(--text-primary);">
+                Kết quả tìm kiếm cho số điện thoại: <span style="color: var(--primary);" th:text="${phone}">0912345678</span>
+            </h3>
+
+            <div th:if="${#lists.isEmpty(foundReservations)}" class="card" style="text-align: center; padding: 40px;">
+                <p style="color: var(--text-muted); margin: 0;">Không tìm thấy đơn đặt vé nào gắn với số điện thoại này. Vui lòng kiểm tra lại.</p>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(foundReservations)}" style="display: flex; flex-direction: column; gap: 14px;">
+                <div th:each="r : ${foundReservations}" class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <strong style="font-family: var(--font-mono); font-size: 16px; color: var(--primary);" th:text="${r.bookingCode}">RES-202611-0001</strong>
+                            <span th:if="${r.status.name() == 'CONFIRMED'}" class="badge badge-success">Đã xuất vé</span>
+                            <span th:if="${r.status.name() == 'CREATED'}" class="badge badge-warning">Đang giữ chỗ</span>
+                            <span th:if="${r.status.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                        </div>
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary);" th:text="${r.departurePlace + ' ➔ ' + r.arrivalPlace}">Hà Nội ➔ Sài Gòn</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                            Khởi hành: <span th:text="${#temporals.format(r.departureDate, 'dd/MM/yyyy HH:mm')}">12/11/2026</span> | 
+                            Khách hàng: <strong th:text="${r.customerName}">Trần Văn An</strong>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 6px;" th:text="${#numbers.formatDecimal(r.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,620,000 đ</div>
+                        <a th:href="@{/reservations/{code}(code=${r.bookingCode}, phone=${phone})}" class="btn btn-outline btn-sm">
+                            Xem Vé &amp; QR Code ➔
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

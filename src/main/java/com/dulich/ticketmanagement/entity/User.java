@@ -39,8 +39,8 @@ public class User {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    private UserRole role = UserRole.STAFF;
+    @Column(name = "role", nullable = false, length = 30)
+    private UserRole role = UserRole.ROLE_TRAVELER;
 
     @Column(name = "status", nullable = false)
     private Boolean status = true;

@@ -31,11 +31,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         String roleName = user.getRole().name();
-        // Ánh xạ STAFF thành NHANVIEN nếu có dữ liệu cũ
-        if ("STAFF".equals(roleName)) {
-            roleName = "NHANVIEN";
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
         }
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+        authorities.add(new SimpleGrantedAuthority(roleName));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

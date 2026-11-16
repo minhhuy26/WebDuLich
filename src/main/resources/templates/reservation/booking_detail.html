@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chi Tiết Đơn Đặt Vé - ' + ${reservation.bookingCode}">Chi Tiết Đơn Vé</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        .ticket-card {
+            background: #fff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .ticket-badge {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        @media print {
+            .navbar-wrapper, footer, .no-print {
+                display: none !important;
+            }
+            .ticket-card {
+                border: 2px solid #000;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('booking')}"></header>
+
+    <div class="app-container" style="padding-top: 32px; padding-bottom: 60px;">
+
+        <!-- BREADCRUMB -->
+        <nav class="no-print" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            <a href="/" style="color: var(--primary); text-decoration: none;">Trang chủ</a> / 
+            <a href="/my-bookings" style="color: var(--primary); text-decoration: none;">Đơn vé của tôi</a> / 
+            <span th:text="${reservation.bookingCode}">RES-202611-0001</span>
+        </nav>
+
+        <!-- FLASH NOTIFICATIONS -->
+        <div th:if="${successMessage}" class="alert alert-success no-print" style="margin-bottom: 20px;" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger no-print" style="margin-bottom: 20px;" th:text="${errorMessage}"></div>
+
+        <!-- HEADER BAR -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                    <h1 style="font-size: 26px; font-weight: 900; margin: 0; font-family: var(--font-mono); color: var(--primary);" 
+                        th:text="${reservation.bookingCode}">
+                        RES-202611-0001
+                    </h1>
+                    
+                    <!-- STATUS BADGE -->
+                    <span th:if="${reservation.status.name() == 'CREATED'}" class="badge badge-warning" style="font-size: 13px; padding: 6px 12px;">
+                        ⏳ Đang giữ chỗ (Chờ thanh toán)
+                    </span>
+                    <span th:if="${reservation.status.name() == 'CONFIRMED'}" class="badge badge-success" style="font-size: 13px; padding: 6px 12px;">
+                        ✅ Đã thanh toán &amp; Xuất vé điện tử
+                    </span>
+                    <span th:if="${reservation.status.name() == 'CANCELLED'}" class="badge badge-danger" style="font-size: 13px; padding: 6px 12px;">
+                        ❌ Đã hủy
+                    </span>
+                    <span th:if="${reservation.status.name() == 'EXPIRED'}" class="badge badge-neutral" style="font-size: 13px; padding: 6px 12px;">
+                        ⏱️ Quá hạn giữ chỗ
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); margin: 0; font-size: 13px;">
+                    Ngày tạo đơn: <span th:text="${#temporals.format(reservation.createdAt, 'dd/MM/yyyy HH:mm:ss')}">10/11/2026 14:00</span> | 
+                    Phương tiện: <strong th:text="${reservation.transportType.fullName}">Hàng không</strong>
+                </p>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="no-print" style="display: flex; gap: 10px;">
+                <button type="button" onclick="window.print()" class="btn btn-outline btn-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    In Vé Điện Tử
+                </button>
+                <a href="/my-bookings" class="btn btn-secondary btn-sm">
+                    Đơn Của Tôi
+                </a>
+            </div>
+        </div>
+
+        <!-- COUNTDOWN TIMER BANNER (NẾU ĐANG TRẠNG THÁI CREATED) -->
+        <div th:if="${reservation.status.name() == 'CREATED'}" class="card no-print" style="background: var(--warning-bg); border: 1px solid var(--warning-border); margin-bottom: 24px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #fef3c7; color: var(--warning); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 750; color: var(--warning-text); margin: 0 0 2px 0;">
+                            Thời gian giữ chỗ đang đếm ngược: <span class="timer-display" style="font-family: var(--font-mono); font-size: 18px; color: var(--danger); font-weight: 800;">15:00</span>
+                        </h3>
+                        <p style="margin: 0; font-size: 13px; color: var(--warning-text);">
+                            Vị trí ghế và giá vé đang được khóa cố định. Vui lòng thanh toán trước khi hết hạn để xuất mã vé &amp; QR Code.
+                        </p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11.5px; color: var(--warning-text); font-weight: 600;">Hết hạn lúc:</div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--warning-text); font-family: var(--font-mono);"
+                         th:data-countdown-target="${#temporals.format(reservation.holdExpiresAt, 'yyyy-MM-dd''T''HH:mm:ss')}"
+                         th:text="${#temporals.format(reservation.holdExpiresAt, 'HH:mm:ss')}">
+                        14:15:00
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: flex-start;">
+
+            <!-- LEFT: TICKETS LIST WITH QR CODE (TEM SỐ VÉ ĐIỆN TỬ) -->
+            <div>
+                <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">
+                    Danh Sách Vé Điện Tử &amp; Mã QR Code (Tem Số)
+                </h2>
+
+                <div th:each="t : ${reservation.tickets}" class="ticket-card">
+                    <!-- TICKET INFO -->
+                    <div style="flex: 1; min-width: 280px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span class="ticket-badge" th:text="${t.transportType.shortName}">Máy bay</span>
+                            <strong style="font-size: 15px; color: var(--text-primary);" th:text="${t.vehicleName}">Vietnam Airlines A321</strong>
+                            <span class="badge badge-neutral" th:text="${t.vehicleCode}">VN210</span>
+                        </div>
+
+                        <div style="font-size: 18px; font-weight: 900; color: var(--primary); margin-bottom: 8px;" th:text="${t.routeInfo}">
+                            Hà Nội ➔ Sài Gòn
+                        </div>
+                        <div th:if="${reservation.isRoundTrip and reservation.returnDate != null}" style="margin-bottom: 8px;">
+                            <span class="badge badge-primary" style="font-size: 11px;">
+                                Vé khứ hồi &bull; Chiều về dự kiến: <strong th:text="${#temporals.format(reservation.returnDate, 'dd/MM/yyyy HH:mm')}">15/11/2026</strong>
+                            </span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px; margin-bottom: 12px; background: #f8fafc; padding: 12px; border-radius: 8px;">
+                            <div>Hành khách: <strong th:text="${t.passengerName}">TRẦN VĂN AN</strong></div>
+                            <div>Loại khách: <span class="badge badge-neutral" th:text="${t.passengerType.displayName}">Người lớn</span></div>
+                            <div>CCCD / Hộ chiếu: <strong th:text="${t.idCard != null ? t.idCard : '(Miễn)'}">001200001234</strong></div>
+                            <div>Vị trí chỗ: <strong style="color: var(--accent); font-size: 15px;" th:text="${t.seatNumber}">12A</strong></div>
+                            <div>Khởi hành: <strong th:text="${#temporals.format(t.departureTime, 'dd/MM/yyyy HH:mm')}">12/11/2026 08:30</strong></div>
+                            <div>Hạng chỗ: <strong th:text="${t.seatClassDisplayName}">Phổ Thông</strong></div>
+                        </div>
+
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-muted);">Mã số vé điện tử (E-Ticket): </span>
+                            <strong style="font-family: var(--font-mono); color: var(--primary);" 
+                                    th:text="${t.ticketCode != null ? t.ticketCode : '(Sẽ cấp sau khi thanh toán)'}">
+                                ETK-AIR-202611-001
+                            </strong>
+                        </div>
+                    </div>
+
+                    <!-- QR CODE DISPLAY -->
+                    <div style="text-align: center; min-width: 160px;">
+                        <div th:if="${t.qrCodeData != null and t.status.name() == 'ISSUED'}">
+                            <img th:src="${t.qrCodeData}" width="140" height="140" alt="Mã QR Code Vé Điện Tử" 
+                                 style="border: 2px solid #cbd5e1; padding: 4px; border-radius: 8px; background: #fff;" />
+                            <div style="font-size: 11px; font-weight: 700; color: #059669; margin-top: 6px;">
+                                QUÉT ĐỂ KIỂM SOÁT
+                            </div>
+                        </div>
+                        <div th:if="${t.status.name() != 'ISSUED'}" 
+                             style="width: 140px; height: 140px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #94a3b8; text-align: center; padding: 8px;">
+                            Mã QR Code sẽ xuất hiện sau khi thanh toán
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CANCEL RESERVATION BUTTON -->
+                <div th:if="${reservation.status.name() == 'CREATED' or reservation.status.name() == 'CONFIRMED'}" class="no-print" style="margin-top: 24px;">
+                    <form method="post" th:action="@{'/reservations/' + ${reservation.bookingCode} + '/cancel'}" 
+                          onsubmit="return confirm('Quý khách có chắc chắn muốn hủy đơn đặt chỗ này không?');">
+                        <input type="hidden" name="phone" th:value="${reservation.customerPhone}" />
+                        <input type="hidden" name="reason" value="Khách hàng chủ động yêu cầu hủy" />
+                        <button type="submit" class="btn btn-danger-outline btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                            Hủy Đơn Đặt Vé Này
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT: PAYMENT & INVOICE -->
+            <div>
+                <!-- PAYMENT BOX (NẾU CHƯA THANH TOÁN) -->
+                <div th:if="${reservation.status.name() == 'CREATED'}" class="card no-print" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                        Thanh Toán Giao Dịch
+                    </h3>
+
+                    <form method="post" th:action="@{/payments/process}">
+                        <input type="hidden" name="bookingCode" th:value="${reservation.bookingCode}" />
+                        <input type="hidden" name="amount" th:value="${reservation.totalAmount}" />
+                        <input type="hidden" name="customerPhone" th:value="${reservation.customerPhone}" />
+
+                        <div style="margin-bottom: 14px;">
+                            <label class="form-label">Chọn hình thức thanh toán</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label th:each="m : ${paymentMethods}" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+                                    <input type="radio" name="paymentMethod" th:value="${m}" th:checked="${m.name() == 'VNPAY'}" />
+                                    <span style="font-size: 13px; font-weight: 600;" th:text="${m.displayName}">VNPAY</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-size: 13px; color: var(--text-muted);">Tổng số tiền thanh toán:</div>
+                            <div style="font-size: 24px; font-weight: 900; color: var(--accent);">
+                                <span th:text="${#numbers.formatDecimal(reservation.totalAmount, 0, 'COMMA', 0, 'POINT')}">1,620,000</span> đ
+                            </div>
+                        </div>
+
+                        <!-- DYNAMIC VIETQR NAPAS247 PAYMENT QR -->
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                                Quét mã VietQR chuyển khoản nhanh 24/7
+                            </div>
+                            <img th:src="@{'https://img.vietqr.io/image/MB-0901000001-compact2.png?amount=' + ${#numbers.formatDecimal(reservation.totalAmount, 0, 'POINT', 0, 'POINT')} + '&addInfo=' + ${reservation.bookingCode} + '&accountName=CONG%20TY%20VIETTRAVEL%20HUB'}"
+                                 alt="Mã VietQR Thanh Toán"
+                                 loading="lazy"
+                                 style="max-width: 190px; height: auto; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; padding: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);" />
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; text-align: left;">
+                                <div>Ngân hàng: <strong>MB Bank (Quân Đội)</strong></div>
+                                <div>Số TK: <strong style="font-family: var(--font-mono);">0901000001</strong></div>
+                                <div>Nội dung CK: <strong style="color: var(--accent); font-family: var(--font-mono);" th:text="${reservation.bookingCode}">RES-202611-0001</strong></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-cta" style="width: 100%; padding: 12px; font-size: 15px; font-weight: 700;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: -2px;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            Xác Nhận Thanh Toán Ngay ➔
+                        </button>
+                    </form>
+                </div>
+
+                <!-- INVOICE INFO -->
+                <div class="card">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                        Hóa Đơn &amp; Người Đặt
+                    </h3>
+
+                    <div style="font-size: 13px; line-height: 1.8;">
+                        <div>Người đặt: <strong th:text="${reservation.customerName}">Trần Văn An</strong></div>
+                        <div>SĐT liên hệ: <strong th:text="${reservation.customerPhone}">0912345678</strong></div>
+                        <div>Email: <strong th:text="${reservation.customerEmail}">an.tran@example.com</strong></div>
+                        <div>Số lượng vé: <strong th:text="${reservation.passengerCount}">1</strong></div>
+                    </div>
+
+                    <div th:if="${not #lists.isEmpty(reservation.transDetails)}" style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                        <h4 style="font-size: 13px; font-weight: 700; color: #059669; margin-bottom: 8px;">
+                            Lịch Sử Giao Dịch (TransDetails):
+                        </h4>
+                        <div th:each="p : ${reservation.transDetails}" style="font-size: 12px; background: #f8fafc; padding: 8px; border-radius: 6px; margin-bottom: 6px;">
+                            <div>Mã GD: <strong th:text="${p.paymentCode}">PAY-202611-001</strong></div>
+                            <div>Phương thức: <span th:text="${p.paymentMethod.displayName}">VNPAY</span></div>
+                            <div>Trạng thái: <span class="badge badge-success" th:text="${p.paymentStatus.displayName}">Thành công</span></div>
+                            <div>Thời gian: <span th:text="${#temporals.format(p.transactionTime, 'dd/MM/yyyy HH:mm')}">10/11/2026 14:02</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

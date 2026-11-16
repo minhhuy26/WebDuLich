@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Vé &amp; Lịch Trình - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('catalog')}"></header>
+
+    <div class="app-container" style="padding-top: 32px; padding-bottom: 70px;">
+
+        <!-- BREADCRUMB -->
+        <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            <a href="/" style="color: var(--primary); text-decoration: none;">Trang chủ</a> / 
+            <span>Tra cứu vé</span> / 
+            <strong th:text="${currentType != null ? currentType.fullName : 'Tất cả phương tiện'}">Vé Máy Bay &amp; Tàu Hỏa</strong>
+        </nav>
+
+        <!-- TITLE & TAB BAR -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <h1 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px 0;">
+                    Danh Mục Vé &amp; Lịch Trình Khả Dụng
+                </h1>
+                <p style="color: var(--text-muted); margin: 0; font-size: 14px;">
+                    Kiểm tra tình trạng chỗ trống theo thời gian thực cho Vé Máy Bay &amp; Vé Tàu Hỏa Thống Nhất.
+                </p>
+            </div>
+            
+            <!-- 2 TABS CHUYỂN ĐỔI PHƯƠNG TIỆN -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a th:href="@{/catalog}" class="btn btn-sm" th:classappend="${currentType == null} ? 'btn-primary' : 'btn-outline'">
+                    Tất Cả Chuyến
+                </a>
+                <a th:href="@{/catalog(type='AIR')}" class="btn btn-sm" th:classappend="${currentType != null and currentType.name() == 'AIR'} ? 'btn-primary' : 'btn-outline'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right: 4px; vertical-align: -2px;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                    Vé Máy Bay
+                </a>
+                <a th:href="@{/catalog(type='TRAIN')}" class="btn btn-sm" th:classappend="${currentType != null and currentType.name() == 'TRAIN'} ? 'btn-primary' : 'btn-outline'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right: 4px; vertical-align: -2px;"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/></svg>
+                    Vé Tàu Hỏa
+                </a>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR FILTER -->
+        <div class="card catalog-filter-card">
+            <form method="get" th:action="@{/catalog}" th:object="${searchDto}" class="catalog-filter-form">
+                <input type="hidden" name="type" th:value="${currentType != null ? currentType.name() : ''}" />
+
+                <div class="catalog-route-pair">
+                    <div class="place-combobox" data-place-combobox="departure">
+                        <label class="form-label" for="departurePlaceInput">Điểm khởi hành</label>
+                        <div class="place-input-group">
+                            <input type="text"
+                                   id="departurePlaceInput"
+                                   name="departurePlace"
+                                   class="place-input"
+                                   th:value="*{departurePlace}"
+                                   placeholder="VD: Hà Nội, Ga Hà Nội..."
+                                   autocomplete="off"
+                                   role="combobox"
+                                   aria-autocomplete="list"
+                                   aria-expanded="false"
+                                   aria-controls="departurePlaceListbox" />
+                            <button type="button"
+                                    class="place-clear-btn"
+                                    title="Xóa điểm khởi hành"
+                                    aria-label="Xóa điểm khởi hành"
+                                    hidden>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                            <button type="button"
+                                    class="place-picker-btn"
+                                    title="Chọn nhanh điểm khởi hành"
+                                    aria-label="Mở danh sách chọn nhanh điểm khởi hành"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    aria-controls="departurePlaceListbox">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                <svg class="place-picker-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                        <div id="departurePlaceListbox" class="place-dropdown" role="listbox" aria-label="Danh sách chọn nhanh điểm khởi hành" hidden></div>
+                    </div>
+
+                    <div class="catalog-swap-wrap">
+                        <button type="button"
+                                id="catalogPlaceSwapBtn"
+                                class="catalog-swap-btn"
+                                title="Đảo chiều điểm khởi hành và điểm đến"
+                                aria-label="Đảo chiều điểm khởi hành và điểm đến">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 6h18"/><path d="m7 22-4-4 4-4"/><path d="M21 18H3"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="place-combobox" data-place-combobox="arrival">
+                        <label class="form-label" for="arrivalPlaceInput">Điểm đến</label>
+                        <div class="place-input-group">
+                            <input type="text"
+                                   id="arrivalPlaceInput"
+                                   name="arrivalPlace"
+                                   class="place-input"
+                                   th:value="*{arrivalPlace}"
+                                   placeholder="VD: Sài Gòn, Đà Nẵng..."
+                                   autocomplete="off"
+                                   role="combobox"
+                                   aria-autocomplete="list"
+                                   aria-expanded="false"
+                                   aria-controls="arrivalPlaceListbox" />
+                            <button type="button"
+                                    class="place-clear-btn"
+                                    title="Xóa điểm đến"
+                                    aria-label="Xóa điểm đến"
+                                    hidden>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                            <button type="button"
+                                    class="place-picker-btn"
+                                    title="Chọn nhanh điểm đến"
+                                    aria-label="Mở danh sách chọn nhanh điểm đến"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    aria-controls="arrivalPlaceListbox">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                <svg class="place-picker-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                        <div id="arrivalPlaceListbox" class="place-dropdown" role="listbox" aria-label="Danh sách chọn nhanh điểm đến" hidden></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label" for="departureDateInput">Ngày khởi hành</label>
+                    <input type="date" id="departureDateInput" name="departureDate" class="form-control catalog-control" th:value="*{departureDate}" />
+                </div>
+                <div>
+                    <label class="form-label" for="passengersSelect">Số hành khách</label>
+                    <select id="passengersSelect" name="passengers" class="form-select catalog-control">
+                        <option value="1" th:selected="*{passengers == 1}">1 khách</option>
+                        <option value="2" th:selected="*{passengers == 2}">2 khách</option>
+                        <option value="3" th:selected="*{passengers == 3}">3 khách</option>
+                        <option value="4" th:selected="*{passengers == 4}">4 khách</option>
+                        <option value="5" th:selected="*{passengers == 5}">5 khách</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary catalog-submit-btn">
+                        Lọc Chuyến
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- FALLBACK NOTICE -->
+        <div th:if="${isFallbackResults}" class="alert alert-info" style="margin-bottom: 20px; align-items: center;">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <div style="flex: 1;">
+                Chưa có chuyến khớp hoàn toàn với bộ lọc đã chọn. Dưới đây là <strong>các chuyến khả dụng hiện có</strong> để quý khách tham khảo.
+            </div>
+            <a th:href="@{/catalog(type=${currentType != null ? currentType.name() : ''})}" class="btn btn-outline btn-sm">Xóa bộ lọc</a>
+        </div>
+
+        <!-- FILTER & SORT TOOLBAR -->
+        <div th:if="${not #lists.isEmpty(tickets)}" class="card catalog-toolbar" style="margin-bottom: 20px; padding: 14px 20px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-xs);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 13.5px; color: var(--text-muted);">Tìm thấy:</span>
+                    <strong id="catalogVisibleCount" style="color: var(--primary); font-size: 16px; font-family: var(--font-mono);" th:text="${#lists.size(tickets)}">10</strong>
+                    <span style="font-size: 13.5px; color: var(--text-muted);">chuyến khả dụng</span>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <!-- SORT -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="catalogSortSelect" style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">Sắp xếp:</label>
+                        <select id="catalogSortSelect" class="form-select form-select-sm" style="font-size: 12.5px; padding: 5px 10px; width: auto; border-radius: var(--radius-sm);">
+                            <option value="time_asc">Giờ đi sớm nhất</option>
+                            <option value="time_desc">Giờ đi muộn nhất</option>
+                            <option value="price_asc">Giá tăng dần</option>
+                            <option value="price_desc">Giá giảm dần</option>
+                        </select>
+                    </div>
+
+                    <!-- CARRIER FILTER -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="catalogCarrierSelect" style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">Hãng:</label>
+                        <select id="catalogCarrierSelect" class="form-select form-select-sm" style="font-size: 12.5px; padding: 5px 10px; width: auto; border-radius: var(--radius-sm);">
+                            <option value="ALL">Tất cả hãng</option>
+                            <option value="Vietnam Airlines">Vietnam Airlines</option>
+                            <option value="Vietjet">Vietjet Air</option>
+                            <option value="Bamboo">Bamboo Airways</option>
+                            <option value="Tàu Thống Nhất">Đường sắt VNR</option>
+                        </select>
+                    </div>
+
+                    <!-- TIME OF DAY FILTER -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="catalogTimeRangeSelect" style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">Khung giờ:</label>
+                        <select id="catalogTimeRangeSelect" class="form-select form-select-sm" style="font-size: 12.5px; padding: 5px 10px; width: auto; border-radius: var(--radius-sm);">
+                            <option value="ALL">Cả ngày</option>
+                            <option value="MORNING">Sáng (06h - 12h)</option>
+                            <option value="AFTERNOON">Chiều (12h - 18h)</option>
+                            <option value="EVENING">Tối (18h - 24h)</option>
+                            <option value="NIGHT">Đêm (00h - 06h)</option>
+                        </select>
+                    </div>
+
+                    <!-- RESET BTN -->
+                    <button type="button" id="catalogResetFiltersBtn" class="btn btn-outline btn-sm" style="font-size: 12px; padding: 5px 12px; border-radius: var(--radius-sm);">
+                        Đặt lại
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS LIST -->
+        <div th:if="${#lists.isEmpty(tickets)}" class="card" style="text-align: center; padding: 50px 24px;">
+            <div style="width: 54px; height: 54px; background: var(--surface-alt); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; color: var(--text-muted);">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 750; color: var(--text-primary); margin-bottom: 8px;">Hiện tại không có chuyến nào đúng lịch trình</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Quý khách vui lòng thử thay đổi điểm đi, điểm đến hoặc xem danh mục toàn bộ các chuyến khả dụng.</p>
+            <a th:href="@{/catalog}" class="btn btn-outline btn-sm">Xem tất cả vé khả dụng</a>
+        </div>
+
+        <!-- EMPTY STATE WHEN FILTER ZERO MATCHES -->
+        <div id="catalogNoFilterMatches" class="card" style="text-align: center; padding: 40px 20px; display: none;">
+            <p style="color: var(--text-muted); margin: 0 0 12px 0; font-size: 14.5px;">Không tìm thấy chuyến nào phù hợp với bộ lọc đã chọn (Hãng hoặc Khung giờ).</p>
+            <button type="button" id="catalogClearSubFilterBtn" class="btn btn-primary btn-sm">Xem lại tất cả kết quả</button>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(tickets)}" id="catalogCardsContainer" style="display: flex; flex-direction: column; gap: 16px;">
+            <div th:each="t : ${tickets}" class="card card-hover ticket-result-item" 
+                 th:data-price="${t.basePrice}"
+                 th:data-time="${#temporals.format(t.departureTime, 'yyyyMMddHHmm')}"
+                 th:data-hour="${t.departureTime.hour}"
+                 th:data-carrier="${t.vehicleName}"
+                 th:data-code="${t.vehicleCode}"
+                 th:data-type="${t.transportType.name()}"
+                 th:style="'padding: 22px; border-left: 4px solid ' + (${t.transportType.name() == 'AIR'} ? '#0062d2' : '#9a3412') + ';'">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    
+                    <!-- VEHICLE & ROUTE -->
+                    <div style="min-width: 280px; flex: 1.2;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span class="badge" th:classappend="${t.transportType.name() == 'AIR'} ? 'badge-primary' : 'badge-orange'" 
+                                  th:text="${t.vehicleCode}">VN210</span>
+                            <span style="font-size: 14.5px; font-weight: 750; color: var(--text-primary);" th:text="${t.vehicleName}">Vietnam Airlines</span>
+                            <span class="badge badge-neutral" style="font-size: 11px;" th:text="${t.seatClassDisplayName}">Phổ Thông</span>
+                        </div>
+
+                        <!-- ROUTE & SEAT -->
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                            <span th:text="${t.departurePlace}">Hà Nội (HAN)</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            <span th:text="${t.arrivalPlace}">TP. Hồ Chí Minh (SGN)</span>
+                        </div>
+
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px; display: flex; gap: 14px; flex-wrap: wrap;">
+                            <span>Chỗ ngồi: <strong style="color: var(--accent); font-family: var(--font-mono);" th:text="${t.seatNumber}">12A</strong></span>
+                            <span>Trạng thái: <strong style="color: var(--success);">Còn chỗ</strong></span>
+                            <span th:if="${t.transportType.name() == 'AIR'}">Hành lý 20kg miễn cước</span>
+                            <span th:if="${t.transportType.name() == 'TRAIN'}">Toa điều hòa &bull; Bảo hiểm đường sắt</span>
+                        </div>
+                    </div>
+
+                    <!-- TIME & DURATION -->
+                    <div style="text-align: center; min-width: 170px;">
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Giờ khởi hành:</div>
+                        <div style="font-size: 17px; font-weight: 800; color: var(--text-primary); font-family: var(--font-mono);" 
+                             th:text="${#temporals.format(t.departureTime, 'HH:mm - dd/MM/yyyy')}">
+                            08:30 - 13/11/2026
+                        </div>
+                        <div style="font-size: 12px; color: var(--success); margin-top: 4px;">Khởi hành đúng giờ</div>
+                    </div>
+
+                    <!-- PRICE & CTA -->
+                    <div style="text-align: right; min-width: 190px;">
+                        <div style="font-size: 11.5px; color: var(--text-muted);">Giá vé cơ bản từ:</div>
+                        <div style="font-size: 22px; font-weight: 900; color: var(--accent); margin: 2px 0 10px 0; font-family: var(--font-mono);">
+                            <span th:text="${#numbers.formatDecimal(t.basePrice, 0, 'COMMA', 0, 'POINT')}">1,500,000</span> đ
+                        </div>
+                        <a th:href="@{/reservations/book(ticketId=${t.id}, passengers=${searchDto.passengers})}" class="btn btn-primary btn-sm" style="font-weight: 700;">
+                            Chọn Chuyến &amp; Giữ Chỗ ➔
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGINATION BAR -->
+        <div id="catalogPaginationBar" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 28px;"></div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+    <script th:inline="javascript">
+        window.VIETTRAVEL_CATALOG_PLACES = {
+            transportType: /*[[${currentType != null ? currentType.name() : 'ALL'}]]*/ 'ALL',
+            airDepartures: /*[[${availableAirDepartures}]]*/ [],
+            airArrivals: /*[[${availableAirArrivals}]]*/ [],
+            trainDepartures: /*[[${availableTrainDepartures}]]*/ [],
+            trainArrivals: /*[[${availableTrainArrivals}]]*/ []
+        };
+    </script>
+
+</body>
+</html>

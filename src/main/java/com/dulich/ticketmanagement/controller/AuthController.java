@@ -5,6 +5,9 @@ import com.dulich.ticketmanagement.entity.enums.UserRole;
 import com.dulich.ticketmanagement.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
@@ -79,10 +83,70 @@ public class AuthController {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(UserRole.KHACH);
+        user.setRole(UserRole.ROLE_TRAVELER);
         user.setStatus(true);
         userRepository.save(user);
 
         return "redirect:/login?registered=true";
+    }
+
+    // HIỂN THỊ TRANG ĐỔI MẬT KHẨU
+    @GetMapping("/change-password")
+    public String showChangePasswordForm(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return "redirect:/login";
+        }
+        User currentUser = userRepository.findByUsername(auth.getName()).orElse(null);
+        model.addAttribute("currentUser", currentUser);
+        return "auth/change_password";
+    }
+
+    // TIẾP NHẬN XỬ LÝ ĐỔI MẬT KHẨU
+    @PostMapping("/change-password")
+    public String processChangePassword(@RequestParam("currentPassword") String currentPassword,
+                                        @RequestParam("newPassword") String newPassword,
+                                        @RequestParam("confirmPassword") String confirmPassword,
+                                        RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return "redirect:/login";
+        }
+
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập mật khẩu hiện tại!");
+            return "redirect:/change-password";
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Mật khẩu hiện tại không chính xác!");
+            return "redirect:/change-password";
+        }
+
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Mật khẩu mới phải có độ dài từ 6 ký tự trở lên!");
+            return "redirect:/change-password";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Mật khẩu xác nhận không trùng khớp với mật khẩu mới!");
+            return "redirect:/change-password";
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Mật khẩu mới không được trùng với mật khẩu hiện tại!");
+            return "redirect:/change-password";
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công! Mật khẩu mới của bạn đã có hiệu lực.");
+        return "redirect:/change-password";
     }
 }

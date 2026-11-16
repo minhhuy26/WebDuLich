@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Chỗ &amp; Giữ Vé - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('booking')}"></header>
+
+    <div class="app-container" style="padding-top: 32px; padding-bottom: 60px;">
+
+        <!-- BREADCRUMB -->
+        <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            <a href="/" style="color: var(--primary); text-decoration: none;">Trang chủ</a> / 
+            <a th:href="@{/catalog(type=${ticket.transportType})}" style="color: var(--primary); text-decoration: none;">Tra cứu vé</a> / 
+            <strong>Xác nhận đặt chỗ</strong>
+        </nav>
+
+        <h1 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px;">
+            Thông Tin Đặt Chỗ &amp; Hành Khách
+        </h1>
+
+        <!-- ALERT NOTICES -->
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 20px;" th:text="${errorMessage}"></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: flex-start;">
+            
+            <!-- LEFT COLUMN: FORM -->
+            <form method="post" th:action="@{/reservations/book}" th:object="${bookingRequest}">
+                <input type="hidden" th:field="*{ticketId}" />
+                <input type="hidden" th:field="*{transportType}" />
+                <input type="hidden" th:field="*{vehicleCode}" />
+                <input type="hidden" th:field="*{vehicleName}" />
+                <input type="hidden" th:field="*{departurePlace}" />
+                <input type="hidden" th:field="*{arrivalPlace}" />
+                <input type="hidden" th:field="*{departureDate}" />
+                <input type="hidden" th:field="*{seatClass}" />
+
+                <!-- SECTION 1: CUSTOMER INFO -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">1</span>
+                        Thông Tin Người Đặt Chỗ (Liên Hệ)
+                    </h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                        <div>
+                            <label class="form-label">Họ và tên người đặt *</label>
+                            <input type="text" th:field="*{customerName}" class="form-control" placeholder="VD: Trần Văn An" required />
+                            <div th:if="${#fields.hasErrors('customerName')}" class="text-danger" th:errors="*{customerName}" style="font-size: 12px; margin-top: 4px;"></div>
+                        </div>
+                        <div>
+                            <label class="form-label">Số điện thoại *</label>
+                            <input type="tel" th:field="*{customerPhone}" class="form-control" placeholder="VD: 0912345678" required />
+                            <div th:if="${#fields.hasErrors('customerPhone')}" class="text-danger" th:errors="*{customerPhone}" style="font-size: 12px; margin-top: 4px;"></div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label class="form-label">Email nhận vé điện tử &amp; Mã QR Code *</label>
+                            <input type="email" th:field="*{customerEmail}" class="form-control" placeholder="VD: an.tran@example.com" required />
+                            <div th:if="${#fields.hasErrors('customerEmail')}" class="text-danger" th:errors="*{customerEmail}" style="font-size: 12px; margin-top: 4px;"></div>
+                            <small style="color: var(--text-muted); font-size: 12px;">Vé điện tử và thông báo giữ chỗ 15 phút sẽ được gửi ngay về hòm thư này.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PASSENGER LIST -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">2</span>
+                        Danh Sách Hành Khách &amp; Thẩm Định Giấy Tờ
+                    </h2>
+
+                    <div th:each="p, stat : *{passengers}" 
+                         class="passenger-input-card"
+                         th:data-pax-index="${stat.index}"
+                         style="padding: 16px; background: var(--surface-alt); border-radius: var(--radius-md); margin-bottom: 16px; border: 1.5px solid var(--border); transition: border-color 0.2s;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-weight: 700; font-size: 14px; color: var(--primary);" 
+                                 th:text="'Hành khách #' + ${stat.count}">
+                                Hành khách #1
+                            </div>
+                            <button type="button" class="btn-select-pax-for-seat btn btn-outline btn-sm" 
+                                    th:data-pax-index="${stat.index}"
+                                    th:data-pax-title="'Hành khách #' + ${stat.count}"
+                                    style="font-size: 11.5px; padding: 3px 10px; border-radius: 20px;">
+                                &#128073; Chọn chỗ trên sơ đồ
+                            </button>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+                            <div>
+                                <label class="form-label">Họ tên hành khách *</label>
+                                <input type="text" th:field="*{passengers[__${stat.index}__].fullName}" class="form-control" placeholder="VIẾT HOA KHÔNG DẤU" required />
+                            </div>
+                            <div>
+                                <label class="form-label">Đối tượng hành khách</label>
+                                <select th:field="*{passengers[__${stat.index}__].passengerType}" class="form-select">
+                                    <option th:each="pt : ${passengerTypes}" th:value="${pt}" th:text="${pt.displayName}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Số CCCD / Hộ chiếu</label>
+                                <input type="text" th:field="*{passengers[__${stat.index}__].idCard}" class="form-control" placeholder="12 chữ số hoặc hộ chiếu" />
+                            </div>
+                            <div>
+                                <label class="form-label">Vị trí chỗ ngồi</label>
+                                <input type="text" th:field="*{passengers[__${stat.index}__].seatNumber}" 
+                                       class="form-control pax-seat-input" 
+                                       th:id="'paxSeatInput_' + ${stat.index}"
+                                       th:data-pax-index="${stat.index}"
+                                       readonly 
+                                       style="font-family: var(--font-mono); font-weight: 700; color: var(--accent); background: #ffffff;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: VISUAL INTERACTIVE SEAT MAP -->
+                <div class="card" style="margin-bottom: 24px;" id="visualSeatMapSection"
+                     th:data-transport-type="${ticket.transportType.name()}"
+                     th:data-base-seat="${ticket.seatNumber}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                        <h2 style="font-size: 18px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">3</span>
+                            Sơ Đồ Chọn Chỗ Ngồi Trực Quan
+                        </h2>
+                        <div style="font-size: 13px; color: var(--text-secondary); background: #f1f5f9; padding: 4px 14px; border-radius: 20px; border: 1px solid var(--border);">
+                            Đang gán ghế cho: <strong id="currentSelectingPaxLabel" style="color: var(--accent); font-weight: 800;">Hành khách #1</strong>
+                        </div>
+                    </div>
+
+                    <!-- SEAT MAP LEGEND -->
+                    <div style="display: flex; gap: 18px; align-items: center; margin-bottom: 18px; font-size: 12.5px; flex-wrap: wrap; background: var(--surface-alt); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 16px; height: 16px; border-radius: 3px; border: 1.5px solid #86efac; background: #ffffff;"></div>
+                            <span>Còn trống (nhấp để chọn)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 16px; height: 16px; border-radius: 3px; border: 1.5px solid var(--accent); background: #fff7ed;"></div>
+                            <span>Đang chọn trong đơn</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 16px; height: 16px; border-radius: 3px; border: 1.5px solid #cbd5e1; background: #f1f5f9;"></div>
+                            <span>Đã có khách khác đặt</span>
+                        </div>
+                    </div>
+
+                    <!-- CARRIAGE / CABIN BODY -->
+                    <div class="carriage-body" style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;">
+                        <div class="carriage-head-mark" style="margin-bottom: 14px; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); text-align: center;">
+                            <span th:if="${ticket.transportType.name() == 'AIR'}">&#9992; BUỒNG LÁI PHI CÔNG / ĐẦU MÁY BAY &#9992;</span>
+                            <span th:if="${ticket.transportType.name() == 'TRAIN'}">&#128646; ĐẦU TOA XE &bull; HƯỚNG CHẠY ĐOÀN TÀU &#128646;</span>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <span class="badge" th:classappend="${ticket.transportType.name() == 'AIR'} ? 'badge-primary' : 'badge-orange'" 
+                                  th:text="${ticket.vehicleName + ' (' + ticket.vehicleCode + ')'}">Vietnam Airlines</span>
+                            <span class="badge badge-neutral" th:text="${ticket.seatClassDisplayName}">Phổ Thông</span>
+                        </div>
+
+                        <!-- SEAT GRID CONTAINER (RENDERED & MANAGED BY JS) -->
+                        <div id="dynamicSeatGrid" class="seat-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px;">
+                            <!-- Sẽ được khởi tạo mượt mà qua initBookingVisualSeatMap() -->
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.5;">
+                        * Quý khách có thể nhấp chọn từng hành khách ở Mục 2, sau đó nhấp vào vị trí ghế mong muốn trên sơ đồ để thay đổi.
+                    </div>
+                </div>
+
+                <!-- SUBMIT CTA -->
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <a th:href="@{/catalog(type=${ticket.transportType})}" class="btn btn-outline">Quay lại</a>
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 28px; font-weight: 700; font-size: 15px;">
+                        Xác Nhận Giữ Chỗ (15 Phút) ➔
+                    </button>
+                </div>
+            </form>
+
+            <!-- RIGHT COLUMN: TRIP SUMMARY CARD -->
+            <div class="card" style="position: sticky; top: 88px; background: var(--surface);">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    Tóm Tắt Chuyến Đi
+                </h3>
+                
+                <div style="margin-bottom: 14px;">
+                    <span class="badge badge-primary" th:text="${ticket.transportType.shortName}">Máy bay</span>
+                    <strong style="margin-left: 6px; font-size: 14px;" th:text="${ticket.vehicleName}">Vietnam Airlines</strong>
+                </div>
+
+                <div style="font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 8px;" th:text="${ticket.routeInfo}">
+                    Hà Nội ➔ Sài Gòn
+                </div>
+
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                    <div>Khởi hành: <strong th:text="${#temporals.format(ticket.departureTime, 'dd/MM/yyyy HH:mm')}">12/11/2026 08:30</strong></div>
+                    <div>Hạng vé: <strong th:text="${ticket.seatClassDisplayName}">Phổ Thông</strong></div>
+                    <div>Vị trí ghế: <strong style="color: var(--accent);" th:text="${ticket.seatNumber}">12A</strong></div>
+                </div>
+
+                <div style="background: var(--surface-alt); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5; display: flex; align-items: flex-start; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div>
+                        <strong style="color: var(--text-primary);">Giữ chỗ an toàn 15 phút:</strong> Đơn giữ chỗ sẽ khóa ghế và giá vé cố định. Sau khi bấm xác nhận, quý khách sẽ có 15 phút để hoàn tất thanh toán.
+                    </div>
+                </div>
+
+                <div style="border-top: 1px dashed var(--border); padding-top: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                        <span>Giá vé cơ bản:</span>
+                        <strong th:text="${#numbers.formatDecimal(ticket.basePrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,500,000 đ</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                        <span>Thuế &amp; Phí dịch vụ:</span>
+                        <strong th:text="${#numbers.formatDecimal(ticket.serviceFee, 0, 'COMMA', 0, 'POINT') + ' đ'}">120,000 đ</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; color: var(--accent); margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+                        <span>Tạm tính (<span th:text="${#lists.size(bookingRequest.passengers)}">1</span> khách):</span>
+                        <span th:text="${#numbers.formatDecimal((ticket.basePrice + ticket.serviceFee) * #lists.size(bookingRequest.passengers), 0, 'COMMA', 0, 'POINT') + ' đ'}">1,620,000 đ</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

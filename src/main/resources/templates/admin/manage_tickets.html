@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho Vé Máy Bay &amp; Tàu Hỏa - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar-wrapper">
+        <div class="app-container-lg">
+            <nav class="navbar">
+                <a href="/admin" class="nav-brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    </div>
+                    <span>VietTravel Hub &bull; Kho Vé Inventory</span>
+                </a>
+                <div class="nav-actions">
+                    <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard</a>
+                    <a href="/" class="btn btn-outline btn-sm">Xem Trang Chủ</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="app-container-lg" style="padding-top: 30px; padding-bottom: 60px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <h1 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 6px 0;">
+                    Kho Vé Máy Bay &amp; Tàu Hỏa (Bảng Tickets)
+                </h1>
+                <p style="color: var(--text-muted); margin: 0; font-size: 14px;">
+                    Kho quản lý chỗ ngồi và chuyến đi: Máy bay và Tàu hỏa.
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="/admin/tickets" class="btn btn-sm" th:classappend="${selectedType == null} ? 'btn-primary' : 'btn-outline'">Tất Cả</a>
+                <a th:each="t : ${transportTypes}" th:href="@{/admin/tickets(type=${t})}" class="btn btn-sm"
+                   th:classappend="${selectedType == t} ? 'btn-primary' : 'btn-outline'" th:text="${t.shortName}">Máy bay</a>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div th:if="${successMessage}" class="alert alert-success" style="margin-bottom: 20px;" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 20px;" th:text="${errorMessage}"></div>
+
+        <!-- CREATE NEW TICKET FORM (COLLAPSIBLE / CARD) -->
+        <div class="card" style="margin-bottom: 28px; background: #f8fafc;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--primary);">
+                + Thêm Chuyến / Vé Mới Vào Kho (Bảng Tickets)
+            </h3>
+            
+            <form method="post" th:action="@{/admin/tickets/new}" th:object="${newTicket}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: flex-end;">
+                <div>
+                    <label class="form-label">Loại Phương Tiện</label>
+                    <select th:field="*{transportType}" class="form-select">
+                        <option th:each="type : ${transportTypes}" th:value="${type}" th:text="${type.fullName}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Số hiệu phương tiện</label>
+                    <input type="text" th:field="*{vehicleCode}" class="form-control" placeholder="VD: VN210, VJ152, SE1, SE3" required />
+                </div>
+                <div>
+                    <label class="form-label">Tên phương tiện / Hãng</label>
+                    <input type="text" th:field="*{vehicleName}" class="form-control" placeholder="VD: Vietnam Airlines" required />
+                </div>
+                <div>
+                    <label class="form-label">Điểm khởi hành</label>
+                    <input type="text" th:field="*{departurePlace}" class="form-control" placeholder="VD: Hà Nội (HAN)" required />
+                </div>
+                <div>
+                    <label class="form-label">Điểm đến</label>
+                    <input type="text" th:field="*{arrivalPlace}" class="form-control" placeholder="VD: Sài Gòn (SGN)" required />
+                </div>
+                <div>
+                    <label class="form-label">Ngày khởi hành</label>
+                    <input type="date" name="depDate" class="form-control" required />
+                </div>
+                <div>
+                    <label class="form-label">Giờ chạy (Giờ : Phút)</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="number" name="depHour" min="0" max="23" value="8" class="form-control" />
+                        <input type="number" name="depMinute" min="0" max="59" value="30" class="form-control" />
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Số ghế / Vị trí</label>
+                    <input type="text" th:field="*{seatNumber}" class="form-control" placeholder="VD: 14A, Toa 2-Ghế 10" required />
+                </div>
+                <div>
+                    <label class="form-label">Hạng chỗ</label>
+                    <input type="text" th:field="*{seatClass}" class="form-control" value="ECONOMY" required />
+                </div>
+                <div>
+                    <label class="form-label">Giá cơ bản (VNĐ)</label>
+                    <input type="number" th:field="*{basePrice}" class="form-control" value="1000000" required />
+                </div>
+                <div>
+                    <label class="form-label">Thuế / Phí dịch vụ</label>
+                    <input type="number" th:field="*{serviceFee}" class="form-control" value="120000" />
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">
+                        Lưu Vào Kho
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TICKETS TABLE -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Loại</th>
+                            <th>Số Hiệu</th>
+                            <th>Hãng / Tên</th>
+                            <th>Hành Trình</th>
+                            <th>Thời Gian Khởi Hành</th>
+                            <th>Số Ghế</th>
+                            <th>Hạng</th>
+                            <th>Giá Vé</th>
+                            <th>Trạng Thái</th>
+                            <th>Mã Vé Đã Cấp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(tickets)}">
+                            <td colspan="11" style="text-align: center; padding: 32px; color: var(--text-muted);">Kho vé hiện đang trống</td>
+                        </tr>
+                        <tr th:each="t : ${tickets}">
+                            <td th:text="${t.id}">1</td>
+                            <td><span class="badge badge-primary" th:text="${t.transportType.shortName}">Máy bay</span></td>
+                            <td><strong style="font-family: var(--font-mono); color: var(--primary);" th:text="${t.vehicleCode}">VN210</strong></td>
+                            <td th:text="${t.vehicleName}">Vietnam Airlines</td>
+                            <td><strong th:text="${t.routeInfo}">Hà Nội ➔ Sài Gòn</strong></td>
+                            <td th:text="${#temporals.format(t.departureTime, 'dd/MM/yyyy HH:mm')}">12/11/2026</td>
+                            <td><strong style="color: var(--accent);" th:text="${t.seatNumber}">12A</strong></td>
+                            <td th:text="${t.seatClassDisplayName}">Phổ Thông</td>
+                            <td><strong th:text="${#numbers.formatDecimal(t.finalPrice, 0, 'COMMA', 0, 'POINT') + ' đ'}">1,620,000 đ</strong></td>
+                            <td>
+                                <span th:if="${t.status.name() == 'AVAILABLE'}" class="badge badge-success">Còn trống</span>
+                                <span th:if="${t.status.name() == 'HELD'}" class="badge badge-warning">Đang giữ chỗ</span>
+                                <span th:if="${t.status.name() == 'ISSUED'}" class="badge badge-neutral">Đã xuất vé</span>
+                            </td>
+                            <td>
+                                <span th:if="${t.ticketCode != null}" style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--primary);" th:text="${t.ticketCode}">ETK-001</span>
+                                <span th:if="${t.ticketCode == null}" style="color: var(--text-muted); font-size: 11px;">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

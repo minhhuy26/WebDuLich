@@ -1,10 +1,10 @@
 package com.dulich.ticketmanagement.entity.enums;
 
 public enum PaymentMethod {
-    CASH("Tiền mặt"),
-    BANK_TRANSFER("Chuyển khoản"),
-    CREDIT_CARD("Thẻ tín dụng / Ghi nợ"),
-    VN_PAY("Cổng VNPAY");
+    VNPAY("Cổng thanh toán VNPAY-QR"),
+    BANK_TRANSFER("Chuyển khoản ngân hàng"),
+    CREDIT_CARD("Thẻ tín dụng / Thẻ ghi nợ quốc tế"),
+    CASH("Tiền mặt tại phòng vé");
 
     private final String displayName;
 

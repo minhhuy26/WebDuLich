@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chính Sách &amp; Hướng Dẫn Nghiệp Vụ - VietTravel Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header th:replace="~{fragments/header :: app-navbar('policies')}"></header>
+
+    <div class="app-container" style="padding-top: 40px; padding-bottom: 70px; max-width: 960px;">
+
+        <!-- BREADCRUMB -->
+        <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            <a href="/" style="color: var(--primary); text-decoration: none;">Trang chủ</a> / 
+            <strong>Chính sách &amp; Tiện ích vận hành</strong>
+        </nav>
+
+        <div style="margin-bottom: 36px;">
+            <span class="badge badge-primary" style="margin-bottom: 10px;">Quy Định &amp; Tiêu Chuẩn Nghiệp Vụ</span>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px 0;">
+                Chính Sách Đặt Chỗ, Giá Vé &amp; Hoàn Đổi Minh Bạch
+            </h1>
+            <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+                Hệ thống áp dụng các giải thuật định giá và thẩm định độc lập cho từng loại phương tiện vận tải (Hàng không &amp; Đường sắt), bảo vệ tối đa quyền lợi của hành khách và tuân thủ các quy định hiện hành.
+            </p>
+        </div>
+
+        <div style="display: grid; gap: 24px;">
+
+            <!-- POLICY 1: GIỮ CHỖ 15 PHÚT -->
+            <div class="card" style="padding: 28px; border-left: 4px solid var(--primary);">
+                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-subtle); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 750; margin: 0 0 8px 0; color: var(--text-primary);">
+                            1. Quy Định Tạm Giữ Chỗ 15 Phút Không Tăng Giá
+                        </h2>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 10px 0;">
+                            Sau khi hoàn tất bước điền thông tin hành khách, hệ thống sẽ tự động khóa ghế (trạng thái <span class="badge badge-warning">HELD</span>) trong đúng <strong>15 phút</strong>. Trong thời gian này, giá vé không thay đổi và ghế của bạn không bị người khác mua đè.
+                        </p>
+                        <ul style="font-size: 13.5px; color: var(--text-secondary); padding-left: 20px; line-height: 1.7; margin: 0;">
+                            <li>Quý khách có thể quét mã QR VNPAY, thanh toán thẻ ATM / Thẻ quốc tế hoặc chuyển khoản 24/7.</li>
+                            <li>Nếu sau 15 phút chưa hoàn tất thanh toán, hệ thống sẽ tự động giải phóng chỗ về kho khả dụng cho hành khách khác.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POLICY 2: VÉ MÁY BAY -->
+            <div class="card" style="padding: 28px; border-left: 4px solid #0284c7;">
+                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #f0f9ff; color: #0284c7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 750; margin: 0 0 8px 0; color: var(--text-primary);">
+                            2. Chính Sách Định Giá &amp; Vé Máy Bay (Hàng Không)
+                        </h2>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 10px 0;">
+                            Triển khai thuật toán định giá vé hàng không linh hoạt:
+                        </p>
+                        <ul style="font-size: 13.5px; color: var(--text-secondary); padding-left: 20px; line-height: 1.7; margin: 0 0 10px 0;">
+                            <li><strong>Thuế &amp; Phí sân bay, soi chiếu an ninh:</strong> Cố định 120.000 đ/khách (miễn phí đối với em bé dưới 2 tuổi).</li>
+                            <li><strong>Người lớn:</strong> 100% giá cơ bản + Phí dịch vụ.</li>
+                            <li><strong>Trẻ em (2 - 12 tuổi):</strong> Giảm 25% giá vé cơ bản (thu 75% + Phí dịch vụ).</li>
+                            <li><strong>Em bé (dưới 2 tuổi):</strong> Giảm 90% giá vé cơ bản (thu 10%, miễn phí soi chiếu).</li>
+                            <li><strong>Thẩm định CCCD / Hộ chiếu:</strong> Bắt buộc số CCCD 12 số hoặc Hộ chiếu chuẩn quốc tế đối với hành khách người lớn.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POLICY 3: VÉ TÀU HỎA -->
+            <div class="card" style="padding: 28px; border-left: 4px solid var(--train-accent);">
+                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--train-subtle); color: var(--train-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 750; margin: 0 0 8px 0; color: var(--text-primary);">
+                            3. Chính Sách Vé Tàu Hỏa Thống Nhất (Đường Sắt Việt Nam)
+                        </h2>
+                        <ul style="font-size: 13.5px; color: var(--text-secondary); padding-left: 20px; line-height: 1.7; margin: 0;">
+                            <li><strong>Bảo hiểm hành khách đường sắt:</strong> Cố định 10.000 đ/vé theo quy chuẩn Tổng công ty Đường sắt Việt Nam (VNR).</li>
+                            <li><strong>Học sinh / Sinh viên:</strong> Giảm ngay 10% giá vé cơ bản khi xuất trình thẻ học sinh, sinh viên hợp lệ.</li>
+                            <li><strong>Người cao tuổi (từ 60 tuổi trở lên):</strong> Giảm 15% giá vé cơ bản theo quy định nhà nước.</li>
+                            <li><strong>Trẻ em (6 - 10 tuổi):</strong> Giảm 25% giá vé cơ bản; trẻ em dưới 6 tuổi đi cùng người lớn được miễn vé (ngồi chung ghế).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POLICY 4: HOÀN HỦY VÉ -->
+            <div class="card" style="padding: 28px; border-left: 4px solid var(--accent);">
+                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--accent-subtle); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 750; margin: 0 0 8px 0; color: var(--text-primary);">
+                            4. Chính Sách Hoàn Hủy &amp; Phí Hủy Vé Tự Động
+                        </h2>
+                        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 10px 0;">
+                            Mức phí hủy vé được hệ thống tự động tính toán dựa trên khoảng thời gian từ lúc gửi yêu cầu hủy tới giờ khởi hành chuyến đi:
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                            <div style="background: var(--surface-alt); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                                <strong style="display: block; font-size: 13px; color: var(--primary);">Hàng không (Máy bay)</strong>
+                                <span style="font-size: 12.5px; color: var(--text-secondary); display: block; margin-top: 4px;">
+                                    &bull; Hủy trước &ge; 24h: Phí 10%<br>
+                                    &bull; Hủy trong vòng 24h: Phí 30%<br>
+                                    &bull; Sau giờ khởi hành: Không hoàn tiền
+                                </span>
+                            </div>
+                            <div style="background: var(--surface-alt); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                                <strong style="display: block; font-size: 13px; color: var(--train-accent);">Đường sắt (Tàu hỏa)</strong>
+                                <span style="font-size: 12.5px; color: var(--text-secondary); display: block; margin-top: 4px;">
+                                    &bull; Hủy trước &ge; 24h: Phí 10%<br>
+                                    &bull; Hủy từ 4h - 24h: Phí 20%<br>
+                                    &bull; Dưới 4h: Không hoàn tiền
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div style="text-align: center; margin-top: 36px;">
+            <a href="/catalog" class="btn btn-primary btn-lg">
+                Khám Phá Vé &amp; Đặt Chuyến Ngay ➔
+            </a>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
+
+</body>
+</html>

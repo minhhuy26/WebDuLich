@@ -23,29 +23,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Keep CSRF protection enabled for every state-changing browser request.
-            // Thymeleaf adds the token automatically to forms that use th:action.
             .csrf(csrf -> {})
             .authorizeHttpRequests(auth -> auth
-                // Tài nguyên tĩnh công khai
+                // 1. Tài nguyên tĩnh công khai
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
-                // Danh sách lịch hẹn bảo mật cho Nhân viên & Admin
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/consultations").hasAnyRole("NHANVIEN", "ADMIN")
-                // Trang chủ, tìm kiếm vé, đặt vé và tra cứu đơn vé công khai (khách vãng lai và thành viên)
-                .requestMatchers("/", "/flights", "/flights/*/book", "/flights/hold", "/flights/booking/**", "/flights/bookings").permitAll()
-                .requestMatchers("/trains", "/trains/*/select-coach", "/trains/booking-form", "/trains/hold", "/trains/booking/**", "/trains/bookings").permitAll()
-                // Khách hàng đặt lịch tư vấn công khai
-                .requestMatchers("/consultations/new", "/consultations/success").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/consultations").permitAll()
-                // Đăng ký, đăng nhập
+
+                // 2. Tra cứu danh mục vé, tìm kiếm, chính sách và trang chủ (công khai)
+                .requestMatchers("/", "/catalog/**", "/tickets/**", "/flights/**", "/trains/**", "/policies", "/my-bookings/lookup").permitAll()
+
+                // 3. Quy trình Đặt vé & Giữ chỗ & Thanh toán (Công khai cho cả khách vãng lai và thành viên)
+                .requestMatchers("/reservations/book", "/reservations/hold", "/reservations/**").permitAll()
+                .requestMatchers("/payments/**").permitAll()
+
+                // 4. Đặt lịch hẹn tư vấn trực tiếp (Workflow 4)
+                .requestMatchers("/appointments/schedule", "/appointments/new", "/appointments/success").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/appointments").permitAll()
+                .requestMatchers("/consultations/**").permitAll()
+
+                // 5. Đăng ký & Đăng nhập
                 .requestMatchers("/login", "/register").permitAll()
-                // Khách xem đơn của chính mình
-                .requestMatchers("/my-bookings/**").hasAnyRole("KHACH", "NHANVIEN", "ADMIN")
-                // Admin quản lý chuyến bay, tàu, ga, người dùng (chỉ ADMIN)
-                .requestMatchers("/admin/flights/**", "/admin/trains/**", "/admin/stations/**", "/admin/users/**").hasRole("ADMIN")
-                // Nhân viên & Admin xử lý đơn vé, lịch hẹn và thống kê
-                .requestMatchers("/admin/**").hasAnyRole("NHANVIEN", "ADMIN")
-                // Tất cả request khác cần đăng nhập
+
+                // 6. Quản lý lịch hẹn tư vấn cho Nhân viên điều hành & Admin
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/appointments").hasAnyAuthority("ROLE_OPERATOR", "ROLE_AGENT", "ROLE_ADMIN")
+
+                // 7. Khu vực tra cứu đơn cá nhân
+                .requestMatchers("/my-bookings/**").hasAnyAuthority("ROLE_TRAVELER", "ROLE_AGENT", "ROLE_OPERATOR", "ROLE_ADMIN")
+
+                // 8. Quản trị hệ thống (Chỉ ROLE_ADMIN)
+                .requestMatchers("/admin/users/**").hasAuthority("ROLE_ADMIN")
+
+                // 9. Quản trị vận hành & Báo cáo doanh thu (ROLE_OPERATOR & ROLE_ADMIN)
+                .requestMatchers("/admin/**").hasAnyAuthority("ROLE_OPERATOR", "ROLE_ADMIN")
+
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -69,9 +78,9 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            boolean isAdminOrStaff = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_NHANVIEN"));
-            if (isAdminOrStaff) {
+            boolean isStaffOrAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_OPERATOR"));
+            if (isStaffOrAdmin) {
                 response.sendRedirect("/admin");
             } else {
                 response.sendRedirect("/my-bookings");
