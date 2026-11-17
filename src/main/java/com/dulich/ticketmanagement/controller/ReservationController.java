@@ -9,11 +9,13 @@ import com.dulich.ticketmanagement.entity.enums.PassengerType;
 import com.dulich.ticketmanagement.entity.enums.PaymentMethod;
 import com.dulich.ticketmanagement.exception.BusinessException;
 import com.dulich.ticketmanagement.repository.UserRepository;
+import com.dulich.ticketmanagement.service.AppointmentService;
 import com.dulich.ticketmanagement.service.ReservationService;
 import com.dulich.ticketmanagement.service.TicketCatalogService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,16 +41,19 @@ public class ReservationController {
     private final TicketCatalogService ticketCatalogService;
     private final UserRepository userRepository;
     private final com.dulich.ticketmanagement.service.QrCodeService qrCodeService;
+    private final AppointmentService appointmentService;
 
     @Autowired
     public ReservationController(ReservationService reservationService,
                                  TicketCatalogService ticketCatalogService,
                                  UserRepository userRepository,
-                                 com.dulich.ticketmanagement.service.QrCodeService qrCodeService) {
+                                 com.dulich.ticketmanagement.service.QrCodeService qrCodeService,
+                                 AppointmentService appointmentService) {
         this.reservationService = reservationService;
         this.ticketCatalogService = ticketCatalogService;
         this.userRepository = userRepository;
         this.qrCodeService = qrCodeService;
+        this.appointmentService = appointmentService;
     }
 
     private User getCurrentUser() {
@@ -247,6 +252,22 @@ public class ReservationController {
             Reservation cancelled = reservationService.cancelReservation(bookingCode, reason);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Đã hủy thành công đơn vé: " + cancelled.getBookingCode());
+        } catch (BusinessException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/reservations/" + bookingCode;
+    }
+
+    // 5. ĐĂNG KÝ HẸN TƯ VẤN CHO CHUYẾN ĐI (CHỈ XUẤT HIỆN SAU KHI ĐẶT VÉ XONG)
+    @PostMapping("/{code}/consultation")
+    public String bookConsultationForReservation(@PathVariable("code") String bookingCode,
+                                                 @RequestParam("consultationDate") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime consultationDate,
+                                                 @RequestParam(value = "notes", required = false) String notes,
+                                                 RedirectAttributes redirectAttributes) {
+        try {
+            appointmentService.scheduleConsultation(bookingCode, consultationDate, notes);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đăng ký lịch hẹn tư vấn chuyến đi thành công! Chuyên viên VietTravel Hub sẽ liên hệ hỗ trợ bạn.");
         } catch (BusinessException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }

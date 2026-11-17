@@ -1,6 +1,5 @@
 package com.dulich.ticketmanagement.service;
 
-import com.dulich.ticketmanagement.entity.Appointment;
 import com.dulich.ticketmanagement.entity.Reservation;
 
 public interface EmailService {
@@ -11,5 +10,5 @@ public interface EmailService {
 
     void sendReservationCancelledEmail(Reservation reservation);
 
-    void sendAppointmentConfirmedEmail(Appointment appointment);
+    void sendConsultationConfirmedEmail(Reservation reservation);
 }

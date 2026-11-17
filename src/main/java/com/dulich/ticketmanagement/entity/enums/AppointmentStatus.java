@@ -1,6 +1,7 @@
 package com.dulich.ticketmanagement.entity.enums;
 
 public enum AppointmentStatus {
+    NONE("Chưa đăng ký"),
     PENDING("Chờ tiếp nhận"),
     CONFIRMED("Đã xác nhận hẹn"),
     COMPLETED("Đã hoàn tất tư vấn"),

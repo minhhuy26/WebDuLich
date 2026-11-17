@@ -1,31 +1,33 @@
--- ==========================================================================================
+﻿-- ==========================================================================================
 -- HỆ THỐNG QUẢN LÝ ĐẶT VÉ DU LỊCH (TRAVEL TICKET BOOKING & MANAGEMENT PORTAL)
--- DỮ LIỆU MẪU CSDL SQL SERVER (5 BẢNG CỐT LÕI - 2 LOẠI VÉ: MÁY BAY & TÀU HỎA)
+-- DỮ LIỆU MẪU CSDL SQL SERVER (4 BẢNG CỐT LÕI - 100% TIẾNG VIỆT)
+-- Lịch hẹn tư vấn được gắn liền với đơn đặt vé (xuất hiện sau khi đặt vé xong)
 -- ==========================================================================================
 
 USE DatVeDuLich;
 GO
 
--- 1. TÀI KHOẢN NGƯỜI DÙNG (4 VAI TRÒ CHUẨN RBAC THEO TÀI LIỆU CỦA THẦY)
-INSERT INTO dbo.users (username, password, full_name, email, phone, role, status, created_at)
-VALUES
-('admin', '$2a$10$6cmGlTKrQWyzEGgNky/4VeTzJwXNapAHF4zUgYVlrW4XgUiSsutRy', N'Quản Trị Viên Hệ Thống', 'admin@dulich.vn', '0901000001', 'ROLE_ADMIN', 1, GETDATE()),
-('operator_mai', '$2a$10$UZHylGdYv7oQf0XvjHV/8eZxQ8UZPU4AwgOTmND0TCm72kNq0Eu42', N'Nguyễn Thị Mai (Điều hành vé)', 'mai.operator@dulich.vn', '0902000002', 'ROLE_OPERATOR', 1, GETDATE()),
-('agent_saigontour', '$2a$10$Xe0a/RzLD.Lujld9jwFYOeZLV4H6pX9pP42sV/.WYt4ykc.XXBzz.', N'Đại Lý Du Lịch Sài Gòn', 'contact@saigontour.vn', '0903000003', 'ROLE_AGENT', 1, GETDATE()),
-('traveler_an', '$2a$10$13iuAPqzfVKeyXbSlJgewOMkUO21XbxDtRp1u2SX7zFeC9tJEcXhm', N'Trần Văn An (Du khách)', 'an.tran@gmail.com', '0912345678', 'ROLE_TRAVELER', 1, GETDATE());
+-- 0. DỌN DẸP DỮ LIỆU CŨ THEO THỨ TỰ KHÓA NGOẠI (GIỮ IDEMPOTENT)
+DELETE FROM dbo.GiaoDich;
+DELETE FROM dbo.Ve;
+DELETE FROM dbo.DonDatCho;
+DELETE FROM dbo.NguoiDung;
 GO
 
--- 2. LỊCH HẸN TƯ VẤN (APPOINTMENTS - WORKFLOW 4 CỦA THẦY)
-INSERT INTO dbo.appointments (appointment_code, user_id, customer_name, phone, email, preferred_date, transport_type, notes, status, assigned_operator_id, created_at)
+-- 1. TÀI KHOẢN NGƯỜI DÙNG (4 VAI TRÒ CHUẨN RBAC - CỐ ĐỊNH ID 1 ĐẾN 4)
+SET IDENTITY_INSERT dbo.NguoiDung ON;
+INSERT INTO dbo.NguoiDung (id, ten_dang_nhap, mat_khau, ho_ten, email, so_dien_thoai, vai_tro, trang_thai, ngay_tao)
 VALUES
-('APT-202611-001', 4, N'Trần Văn An', '0912345678', 'an.tran@gmail.com', DATEADD(day, 2, GETDATE()), 'AIR', N'Tư vấn đặt vé đoàn bay Phú Quốc 15 người dịp Tết', 'CONFIRMED', 2, GETDATE()),
-('APT-202611-002', 3, N'Đại Lý Du Lịch Sài Gòn', '0903000003', 'contact@saigontour.vn', DATEADD(day, 3, GETDATE()), 'TRAIN', N'Đăng ký giữ chỗ nguyên toa giường nằm tàu SE1 tuyến Bắc Nam', 'PENDING', 2, GETDATE()),
-('APT-202611-003', NULL, N'Lê Hoàng Long', '0988776655', 'long.le@gmail.com', DATEADD(day, 1, GETDATE()), 'AIR', N'Tư vấn gói bảo hiểm và đổi chuyến bay Hà Nội - Đà Nẵng', 'PENDING', NULL, GETDATE());
+(1, 'admin', '$2a$10$6cmGlTKrQWyzEGgNky/4VeTzJwXNapAHF4zUgYVlrW4XgUiSsutRy', N'Quản Trị Viên Hệ Thống', 'admin@dulich.vn', '0901000001', 'ROLE_ADMIN', 1, GETDATE()),
+(2, 'operator_mai', '$2a$10$UZHylGdYv7oQf0XvjHV/8eZxQ8UZPU4AwgOTmND0TCm72kNq0Eu42', N'Nguyễn Thị Mai (Điều hành vé)', 'mai.operator@dulich.vn', '0902000002', 'ROLE_OPERATOR', 1, GETDATE()),
+(3, 'agent_saigontour', '$2a$10$Xe0a/RzLD.Lujld9jwFYOeZLV4H6pX9pP42sV/.WYt4ykc.XXBzz.', N'Đại Lý Du Lịch Sài Gòn', 'contact@saigontour.vn', '0903000003', 'ROLE_AGENT', 1, GETDATE()),
+(4, 'traveler_an', '$2a$10$13iuAPqzfVKeyXbSlJgewOMkUO21XbxDtRp1u2SX7zFeC9tJEcXhm', N'Trần Văn An (Du khách)', 'an.tran@gmail.com', '0912345678', 'ROLE_TRAVELER', 1, GETDATE());
+SET IDENTITY_INSERT dbo.NguoiDung OFF;
 GO
 
--- 3. KHO VÉ & LỊCH TRÌNH 2 LOẠI PHƯƠNG TIỆN (TICKETS - INVENTORY)
--- 3.1. VÉ MÁY BAY (AIR) - Vietnam Airlines, Vietjet Air, Bamboo Airways
-INSERT INTO dbo.tickets (transport_type, vehicle_code, vehicle_name, route_info, departure_place, arrival_place, departure_time, arrival_time, seat_number, seat_class, passenger_name, id_card, passenger_type, base_price, service_fee, extra_fee, final_price, ticket_code, qr_code_data, status, created_at)
+-- 2. KHO VÉ & LỊCH TRÌNH 2 LOẠI PHƯƠNG TIỆN (Ve)
+-- 2.1. VÉ MÁY BAY (AIR) - Vietnam Airlines, Vietjet Air, Bamboo Airways
+INSERT INTO dbo.Ve (loai_phuong_tien, so_hieu_chuyen, ten_phuong_tien, tuyen_duong, diem_di, diem_den, gio_di, gio_den, so_ghe, hang_ve, ten_hanh_khach, so_cccd, loai_khach, gia_goc, phi_dich_vu, phu_phi, gia_cuoi, ma_ve_dien_tu, du_lieu_qr, trang_thai, ngay_tao)
 VALUES
 ('AIR', 'VN210', N'Vietnam Airlines Airbus A321', N'Hà Nội (HAN) ➔ TP. Hồ Chí Minh (SGN)', N'Hà Nội (HAN)', N'TP. Hồ Chí Minh (SGN)', DATEADD(day, 3, GETDATE()), DATEADD(minute, 130, DATEADD(day, 3, GETDATE())), '12A', 'ECONOMY', NULL, NULL, 'ADULT', 1500000, 120000, 0, 1620000, NULL, NULL, 'AVAILABLE', GETDATE()),
 ('AIR', 'VN210', N'Vietnam Airlines Airbus A321', N'Hà Nội (HAN) ➔ TP. Hồ Chí Minh (SGN)', N'Hà Nội (HAN)', N'TP. Hồ Chí Minh (SGN)', DATEADD(day, 3, GETDATE()), DATEADD(minute, 130, DATEADD(day, 3, GETDATE())), '12B', 'ECONOMY', NULL, NULL, 'ADULT', 1500000, 120000, 0, 1620000, NULL, NULL, 'AVAILABLE', GETDATE()),
@@ -36,8 +38,8 @@ VALUES
 ('AIR', 'VJ135', N'Vietjet Air Airbus A320', N'Đà Nẵng (DAD) ➔ Hà Nội (HAN)', N'Đà Nẵng (DAD)', N'Hà Nội (HAN)', DATEADD(day, 3, GETDATE()), DATEADD(minute, 80, DATEADD(day, 3, GETDATE())), '11B', 'ECONOMY', NULL, NULL, 'ADULT', 950000, 120000, 0, 1070000, NULL, NULL, 'AVAILABLE', GETDATE()),
 ('AIR', 'QH204', N'Bamboo Airways Embraer 190', N'Phú Quốc (PQC) ➔ Hà Nội (HAN)', N'Phú Quốc (PQC)', N'Hà Nội (HAN)', DATEADD(day, 4, GETDATE()), DATEADD(minute, 135, DATEADD(day, 4, GETDATE())), '07C', 'ECONOMY', NULL, NULL, 'ADULT', 1890000, 120000, 0, 2010000, NULL, NULL, 'AVAILABLE', GETDATE());
 
--- 3.2. VÉ TÀU HỎA (TRAIN) - Tuyến Thống Nhất Bắc - Nam (SE1, SE2, SE3, SE4, SE5)
-INSERT INTO dbo.tickets (transport_type, vehicle_code, vehicle_name, route_info, departure_place, arrival_place, departure_time, arrival_time, seat_number, seat_class, passenger_name, id_card, passenger_type, base_price, service_fee, extra_fee, final_price, ticket_code, qr_code_data, status, created_at)
+-- 2.2. VÉ TÀU HỎA (TRAIN) - Tuyến Thống Nhất Bắc - Nam (SE1, SE2, SE3, SE4, SE5)
+INSERT INTO dbo.Ve (loai_phuong_tien, so_hieu_chuyen, ten_phuong_tien, tuyen_duong, diem_di, diem_den, gio_di, gio_den, so_ghe, hang_ve, ten_hanh_khach, so_cccd, loai_khach, gia_goc, phi_dich_vu, phu_phi, gia_cuoi, ma_ve_dien_tu, du_lieu_qr, trang_thai, ngay_tao)
 VALUES
 ('TRAIN', 'SE1', N'Đoàn Tàu Thống Nhất SE1', N'Ga Hà Nội ➔ Ga Đà Nẵng', N'Ga Hà Nội', N'Ga Đà Nẵng', DATEADD(day, 2, GETDATE()), DATEADD(hour, 16, DATEADD(day, 2, GETDATE())), N'Toa 2 - Ghế 15', 'SOFT_SEAT', NULL, NULL, 'ADULT', 580000, 10000, 0, 590000, NULL, NULL, 'AVAILABLE', GETDATE()),
 ('TRAIN', 'SE1', N'Đoàn Tàu Thống Nhất SE1', N'Ga Hà Nội ➔ Ga Đà Nẵng', N'Ga Hà Nội', N'Ga Đà Nẵng', DATEADD(day, 2, GETDATE()), DATEADD(hour, 16, DATEADD(day, 2, GETDATE())), N'Toa 4 - Giường 11', 'SLEEPER_4', NULL, NULL, 'ADULT', 950000, 10000, 0, 960000, NULL, NULL, 'AVAILABLE', GETDATE()),
@@ -47,18 +49,33 @@ VALUES
 ('TRAIN', 'SE4', N'Đoàn Tàu Thống Nhất SE4', N'Ga Đà Nẵng ➔ Ga Hà Nội', N'Ga Đà Nẵng', N'Ga Hà Nội', DATEADD(day, 3, GETDATE()), DATEADD(hour, 16, DATEADD(day, 3, GETDATE())), N'Toa 2 - Ghế 18', 'SOFT_SEAT', NULL, NULL, 'ADULT', 580000, 10000, 0, 590000, NULL, NULL, 'AVAILABLE', GETDATE());
 GO
 
--- 4. ĐƠN ĐẶT CHỖ MẪU ĐÃ XÁC NHẬN & PHÁT HÀNH VÉ (RESERVATIONS & TRANS_DETAILS)
-INSERT INTO dbo.reservations (booking_code, user_id, customer_name, customer_phone, customer_email, transport_type, departure_place, arrival_place, departure_date, return_date, is_round_trip, passenger_count, total_amount, status, hold_expires_at, cancel_reason, created_at)
+-- 3. ĐƠN ĐẶT CHỖ MẪU (TÍCH HỢP LỊCH HẸN TƯ VẤN SAU KHI ĐẶT VÉ)
+SET IDENTITY_INSERT dbo.DonDatCho ON;
+-- Đơn 1: Đã xác nhận & có yêu cầu tư vấn đã được Chuyên viên Mai (id=2) xác nhận
+INSERT INTO dbo.DonDatCho (id, ma_dat_cho, nguoi_dung_id, ten_khach_hang, so_dien_thoai, email, loai_phuong_tien, diem_di, diem_den, ngay_di, ngay_ve, la_khu_hoi, so_luong_khach, tong_tien, trang_thai, han_giu_cho, ly_do_huy, co_hen_tu_van, ngay_hen_tu_van, ghi_chu_tu_van, trang_thai_tu_van, nhan_vien_tu_van_id, ngay_tao)
 VALUES
-('RES-202611-0001', 4, N'Trần Văn An', '0912345678', 'an.tran@gmail.com', 'AIR', N'Hà Nội (HAN)', N'TP. Hồ Chí Minh (SGN)', DATEADD(day, 7, GETDATE()), NULL, 0, 1, 1620000, 'CONFIRMED', DATEADD(hour, 1, GETDATE()), NULL, GETDATE());
+(1, 'RES-202611-0001', 4, N'Trần Văn An', '0912345678', 'an.tran@gmail.com', 'AIR', N'Hà Nội (HAN)', N'TP. Hồ Chí Minh (SGN)', DATEADD(day, 7, GETDATE()), NULL, 0, 1, 1620000, 'CONFIRMED', DATEADD(hour, 1, GETDATE()), NULL, 1, DATEADD(day, 2, GETDATE()), N'Tư vấn thêm hành lý ký gửi quá cước và dịch vụ đón tiễn sân bay', 'CONFIRMED', 2, GETDATE());
 
--- Cập nhật 1 vé thành ĐÃ XUẤT VÉ gán vào đơn RES-202611-0001
-INSERT INTO dbo.tickets (reservation_id, transport_type, vehicle_code, vehicle_name, route_info, departure_place, arrival_place, departure_time, arrival_time, seat_number, seat_class, passenger_name, id_card, passenger_type, base_price, service_fee, extra_fee, final_price, ticket_code, qr_code_data, status, created_at)
+-- Đơn 2: Đã xác nhận & có yêu cầu tư vấn đang chờ xử lý (PENDING)
+INSERT INTO dbo.DonDatCho (id, ma_dat_cho, nguoi_dung_id, ten_khach_hang, so_dien_thoai, email, loai_phuong_tien, diem_di, diem_den, ngay_di, ngay_ve, la_khu_hoi, so_luong_khach, tong_tien, trang_thai, han_giu_cho, ly_do_huy, co_hen_tu_van, ngay_hen_tu_van, ghi_chu_tu_van, trang_thai_tu_van, nhan_vien_tu_van_id, ngay_tao)
+VALUES
+(2, 'RES-202611-0002', 3, N'Đại Lý Du Lịch Sài Gòn', '0903000003', 'contact@saigontour.vn', 'TRAIN', N'Ga Hà Nội', N'Ga Sài Gòn', DATEADD(day, 10, GETDATE()), NULL, 0, 1, 1360000, 'CONFIRMED', DATEADD(hour, 1, GETDATE()), NULL, 1, DATEADD(day, 3, GETDATE()), N'Tư vấn xuất hóa đơn VAT điện tử cho đoàn công tác', 'PENDING', NULL, GETDATE());
+SET IDENTITY_INSERT dbo.DonDatCho OFF;
+GO
+
+-- Cập nhật vé đã xuất gắn vào đơn RES-202611-0001
+INSERT INTO dbo.Ve (don_dat_cho_id, loai_phuong_tien, so_hieu_chuyen, ten_phuong_tien, tuyen_duong, diem_di, diem_den, gio_di, gio_den, so_ghe, hang_ve, ten_hanh_khach, so_cccd, loai_khach, gia_goc, phi_dich_vu, phu_phi, gia_cuoi, ma_ve_dien_tu, du_lieu_qr, trang_thai, ngay_tao)
 VALUES
 (1, 'AIR', 'VN210', N'Vietnam Airlines Airbus A321', N'Hà Nội (HAN) ➔ TP. Hồ Chí Minh (SGN)', N'Hà Nội (HAN)', N'TP. Hồ Chí Minh (SGN)', DATEADD(day, 7, GETDATE()), DATEADD(minute, 130, DATEADD(day, 7, GETDATE())), '14C', 'ECONOMY', N'Trần Văn An', '001200001234', 'ADULT', 1500000, 120000, 0, 1620000, 'ETK-AIR-998822', 'VERIFY:ETK-AIR-998822|RES-202611-0001|VN210|14C|TRAN VAN AN', 'ISSUED', GETDATE());
 
--- Ghi nhận lịch sử giao dịch thanh toán trong trans_details
-INSERT INTO dbo.trans_details (reservation_id, payment_code, amount, payment_method, payment_status, transaction_reference, note, transaction_time)
+-- Cập nhật vé đã xuất gắn vào đơn RES-202611-0002
+INSERT INTO dbo.Ve (don_dat_cho_id, loai_phuong_tien, so_hieu_chuyen, ten_phuong_tien, tuyen_duong, diem_di, diem_den, gio_di, gio_den, so_ghe, hang_ve, ten_hanh_khach, so_cccd, loai_khach, gia_goc, phi_dich_vu, phu_phi, gia_cuoi, ma_ve_dien_tu, du_lieu_qr, trang_thai, ngay_tao)
 VALUES
-(1, 'PAY-202611-9988', 1620000, 'VNPAY', 'SUCCESS', 'VNPAY-REF-88776655', N'Thanh toán thành công qua VNPAY-QR mã đơn RES-202611-0001', GETDATE());
+(2, 'TRAIN', 'SE3', N'Đoàn Tàu Thống Nhất SE3', N'Ga Hà Nội ➔ Ga Sài Gòn', N'Ga Hà Nội', N'Ga Sài Gòn', DATEADD(day, 10, GETDATE()), DATEADD(hour, 30, DATEADD(day, 10, GETDATE())), N'Toa 5 - Giường 09 VIP', 'SLEEPER_4', N'Nguyễn Văn Bình', '079200004567', 'ADULT', 1350000, 10000, 0, 1360000, 'ETK-TRN-776655', 'VERIFY:ETK-TRN-776655|RES-202611-0002|SE3|G09|NGUYEN VAN BINH', 'ISSUED', GETDATE());
+
+-- 4. GIAO DỊCH THANH TOÁN (GiaoDich)
+INSERT INTO dbo.GiaoDich (don_dat_cho_id, ma_giao_dich, so_tien, phuong_thuc, trang_thai, ma_tham_chieu, ghi_chu, thoi_gian_giao_dich)
+VALUES
+(1, 'PAY-202611-9988', 1620000, 'VNPAY', 'SUCCESS', 'VNPAY-REF-88776655', N'Thanh toán thành công qua VNPAY-QR mã đơn RES-202611-0001', GETDATE()),
+(2, 'PAY-202611-9989', 1360000, 'BANK_TRANSFER', 'SUCCESS', 'MB-REF-44332211', N'Chuyển khoản VietQR thành công mã đơn RES-202611-0002', GETDATE());
 GO

@@ -96,25 +96,25 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendAppointmentConfirmedEmail(com.dulich.ticketmanagement.entity.Appointment appointment) {
-        if (appointment == null || appointment.getEmail() == null || appointment.getEmail().isBlank()) {
+    public void sendConsultationConfirmedEmail(Reservation reservation) {
+        if (reservation == null || reservation.getCustomerEmail() == null || reservation.getCustomerEmail().isBlank()) {
             return;
         }
-        String subject = "【VietTravel Hub】Xác nhận đăng ký lịch hẹn tư vấn: " + appointment.getAppointmentCode();
+        String subject = "【VietTravel Hub】Xác nhận đăng ký lịch hẹn tư vấn đơn vé: " + reservation.getBookingCode();
         String content = "<div style='font-family: Arial, sans-serif; max-width: 600px; line-height: 1.6; color: #333;'>" +
-                "<h2 style='color: #0062d2;'>Kính chào Quý khách " + appointment.getCustomerName() + "!</h2>" +
-                "<p>Hệ thống <b>VietTravel Hub</b> đã tiếp nhận yêu cầu đặt lịch hẹn tư vấn dịch vụ du lịch của Quý khách:</p>" +
+                "<h2 style='color: #0062d2;'>Kính chào Quý khách " + reservation.getCustomerName() + "!</h2>" +
+                "<p>Hệ thống <b>VietTravel Hub</b> đã tiếp nhận yêu cầu đặt lịch hẹn tư vấn cho chuyến đi của Quý khách:</p>" +
                 "<div style='background: #f0fdf4; padding: 16px; border: 1px solid #bbf7d0; border-radius: 8px; margin: 16px 0;'>" +
-                "<p style='margin: 4px 0;'>Mã cuộc hẹn: <b style='color: #15803d; font-size: 16px;'>" + appointment.getAppointmentCode() + "</b></p>" +
-                "<p style='margin: 4px 0;'>Thời gian hẹn tư vấn: <b>" + appointment.getPreferredDate() + "</b></p>" +
-                "<p style='margin: 4px 0;'>Loại phương tiện quan tâm: <b>" + (appointment.getTransportType() != null ? appointment.getTransportType().getFullName() : "Tất cả") + "</b></p>" +
-                "<p style='margin: 4px 0;'>Số điện thoại liên hệ: <b>" + appointment.getPhone() + "</b></p>" +
-                "<p style='margin: 4px 0;'>Ghi chú yêu cầu: <i>" + (appointment.getNotes() != null ? appointment.getNotes() : "Tư vấn lộ trình") + "</i></p>" +
+                "<p style='margin: 4px 0;'>Mã đơn vé liên quan: <b style='color: #15803d; font-size: 16px;'>" + reservation.getBookingCode() + "</b></p>" +
+                "<p style='margin: 4px 0;'>Hành trình: <b>" + reservation.getDeparturePlace() + " ➔ " + reservation.getArrivalPlace() + "</b></p>" +
+                "<p style='margin: 4px 0;'>Thời gian hẹn tư vấn: <b>" + reservation.getConsultationDate() + "</b></p>" +
+                "<p style='margin: 4px 0;'>Số điện thoại liên hệ: <b>" + reservation.getCustomerPhone() + "</b></p>" +
+                "<p style='margin: 4px 0;'>Ghi chú yêu cầu: <i>" + (reservation.getConsultationNotes() != null ? reservation.getConsultationNotes() : "Tư vấn chuyến đi") + "</i></p>" +
                 "</div>" +
-                "<p>Chuyên viên điều hành của chúng tôi sẽ liên hệ lại với Quý khách trước giờ hẹn ít nhất 1 giờ.</p>" +
+                "<p>Chuyên viên điều hành của chúng tôi sẽ liên hệ lại với Quý khách trước giờ hẹn.</p>" +
                 "<p>Trân trọng cảm ơn Quý khách,<br><b>Phòng Điều Hành Dịch Vụ - VietTravel Hub</b></p>" +
                 "</div>";
-        sendHtmlEmail(appointment.getEmail(), subject, content);
+        sendHtmlEmail(reservation.getCustomerEmail(), subject, content);
     }
 
     private void sendHtmlEmail(String toEmail, String subject, String htmlContent) {

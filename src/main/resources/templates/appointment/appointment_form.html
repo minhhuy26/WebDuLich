@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Lịch Hẹn Tư Vấn - VietTravel Hub</title>
+    <title>Đăng Ký Lịch Hẹn Tư Vấn Chuyến Đi - VietTravel Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -22,24 +22,44 @@
                 <!-- HEADER -->
                 <div style="margin-bottom: 24px;">
                     <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--primary-subtle); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="8" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     </div>
                     <h1 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 6px 0;">
-                        Đăng Ký Lịch Hẹn Tư Vấn Trực Tiếp
+                        Lịch Hẹn Tư Vấn Sau Khi Đặt Vé
                     </h1>
                     <p style="font-size: 14px; color: var(--text-muted); margin: 0;">
-                        Chuyên viên điều hành tour và tư vấn vé đoàn sẽ liên hệ xác nhận và xếp lịch làm việc trực tiếp cùng quý khách.
+                        Dịch vụ tư vấn chuyên sâu chỉ áp dụng sau khi quý khách đã hoàn tất tạo đơn đặt vé máy bay hoặc tàu hỏa.
                     </p>
                 </div>
 
-                <!-- WORKING HOURS NOTICE -->
-                <div class="alert alert-info" style="margin-bottom: 24px;">
+                <!-- BOOKING ATTACHMENT NOTICE -->
+                <div th:if="${reservation != null}" class="alert alert-success" style="margin-bottom: 20px;">
                     <div style="font-size: 13px;">
-                        <strong>Thời gian tiếp nhận &amp; hỗ trợ tư vấn:</strong>
+                        <strong>Đang gắn lịch hẹn cho đơn vé: </strong>
+                        <span style="font-family: var(--font-mono); font-weight: 800; color: #059669;" th:text="${reservation.bookingCode}">RES-202611-0001</span>
+                        <div style="margin-top: 4px;">
+                            Hành trình: <strong th:text="${reservation.departurePlace}">Hà Nội</strong> ➔ <strong th:text="${reservation.arrivalPlace}">Sài Gòn</strong> 
+                            | Khách: <strong th:text="${reservation.customerName}">Trần Văn An</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${reservation == null}" class="alert alert-info" style="margin-bottom: 20px;">
+                    <div style="font-size: 13px;">
+                        <strong>💡 Bạn chưa có đơn đặt vé?</strong> Lịch hẹn tư vấn được liên kết trực tiếp với mã đơn vé để chuyên viên hỗ trợ chính xác nhất.
+                        <div style="margin-top: 6px;">
+                            <a href="/catalog" class="btn btn-outline btn-sm" style="background: #fff; font-size: 12px;">+ Tra cứu & Đặt vé ngay</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORKING HOURS NOTICE -->
+                <div class="alert alert-neutral" style="margin-bottom: 24px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 13px; color: #475569;">
+                        <strong>Quy định tiếp nhận hẹn tư vấn:</strong>
                         <ul style="margin: 6px 0 0 16px; padding: 0;">
-                            <li>Khung giờ tiếp nhận: <strong>08:00 đến 17:30</strong> từ <strong>Thứ Hai đến Thứ Bảy</strong> (Chủ nhật nghỉ).</li>
-                            <li>Tối đa <strong>20 lượt hẹn / ngày</strong> để chuyên viên chuẩn bị kỹ lưỡng lộ trình và báo giá chiết khấu.</li>
-                            <li>Xác nhận lịch hẹn qua SMS &amp; Email ngay sau khi hoàn tất đăng ký.</li>
+                            <li>Thời gian làm việc: <strong>08:00 - 17:30</strong> (Thứ Hai đến Thứ Bảy).</li>
+                            <li>Tối đa <strong>20 cuộc hẹn / ngày</strong> trên toàn hệ thống.</li>
                         </ul>
                     </div>
                 </div>
@@ -51,47 +71,25 @@
                 <form method="post" th:action="@{/appointments/schedule}" th:object="${appointment}">
                     
                     <div class="form-group" style="margin-bottom: 16px;">
-                        <label class="form-label">Họ và tên của bạn *</label>
-                        <input type="text" th:field="*{customerName}" class="form-control" placeholder="Ví dụ: Trần Văn An" required />
-                        <div th:if="${#fields.hasErrors('customerName')}" class="text-danger" th:errors="*{customerName}" style="font-size: 12px; margin-top: 4px;"></div>
+                        <label class="form-label">Mã Đơn Đặt Vé (Booking Code) *</label>
+                        <input type="text" th:field="*{bookingCode}" class="form-control" placeholder="Ví dụ: RES-202611-0001" 
+                               th:readonly="${reservation != null}" required style="font-family: var(--font-mono); font-weight: 700;" />
+                        <div th:if="${#fields.hasErrors('bookingCode')}" class="text-danger" th:errors="*{bookingCode}" style="font-size: 12px; margin-top: 4px;"></div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label class="form-label">Số điện thoại liên hệ *</label>
-                            <input type="tel" th:field="*{phone}" class="form-control" placeholder="Ví dụ: 0912345678" required />
-                            <div th:if="${#fields.hasErrors('phone')}" class="text-danger" th:errors="*{phone}" style="font-size: 12px; margin-top: 4px;"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Địa chỉ Email</label>
-                            <input type="email" th:field="*{email}" class="form-control" placeholder="an.tran@example.com" />
-                            <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}" style="font-size: 12px; margin-top: 4px;"></div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label class="form-label">Phương tiện quan tâm *</label>
-                            <select th:field="*{transportType}" class="form-select">
-                                <option th:each="type : ${transportTypes}" th:value="${type}" th:text="${type.fullName}">Vé máy bay</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Thời gian hẹn mong muốn *</label>
-                            <input type="datetime-local" th:field="*{preferredDate}" class="form-control" required />
-                            <div th:if="${#fields.hasErrors('preferredDate')}" class="text-danger" th:errors="*{preferredDate}" style="font-size: 12px; margin-top: 4px;"></div>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Thời gian hẹn mong muốn (08:00 - 17:30 T2-T7) *</label>
+                        <input type="datetime-local" th:field="*{preferredDate}" class="form-control" required />
+                        <div th:if="${#fields.hasErrors('preferredDate')}" class="text-danger" th:errors="*{preferredDate}" style="font-size: 12px; margin-top: 4px;"></div>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 24px;">
-                        <label class="form-label">Nội dung / Yêu cầu chi tiết</label>
-                        <textarea th:field="*{notes}" class="form-control" rows="3" placeholder="Ví dụ: Cần tư vấn đặt vé đoàn 20 người đi Đà Nẵng, cần xuất hóa đơn VAT..."></textarea>
+                        <label class="form-label">Nội dung cần tư vấn chi tiết</label>
+                        <textarea th:field="*{notes}" class="form-control" rows="3" placeholder="Ví dụ: Tư vấn nâng hạng thương gia, hỗ trợ xuất hóa đơn VAT công ty, đăng ký thêm hành lý..."></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; font-size: 16px;">
-                        Xác Nhận Đăng Ký Lịch Hẹn ➔
+                        Xác Nhận Đăng Ký Lịch Hẹn Tư Vấn ➔
                     </button>
                 </form>
 

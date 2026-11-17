@@ -204,8 +204,65 @@
                 </div>
             </div>
 
-            <!-- RIGHT: PAYMENT & INVOICE -->
+            <!-- RIGHT: PAYMENT, CONSULTATION & INVOICE -->
             <div>
+                <!-- CONSULTATION BOX (CHỈ XUẤT HIỆN SAU KHI ĐẶT VÉ XONG) -->
+                <div class="card no-print" style="margin-bottom: 24px; border: 1.5px solid #38bdf8; background: #f0f9ff; border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <div style="width: 36px; height: 36px; border-radius: 8px; background: #0284c7; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 800; color: #0369a1; margin: 0;">Lịch Hẹn Tư Vấn Chuyến Đi</h3>
+                            <p style="font-size: 12px; color: #0284c7; margin: 2px 0 0 0;">Dịch vụ chăm sóc sau khi đặt vé</p>
+                        </div>
+                    </div>
+
+                    <!-- TRƯỜNG HỢP 1: ĐÃ ĐĂNG KÝ HẸN TƯ VẤN -->
+                    <div th:if="${reservation.hasConsultation}">
+                        <div style="background: #ffffff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Trạng thái tư vấn:</span>
+                                <span th:if="${reservation.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">⏳ Chờ chuyên viên gọi</span>
+                                <span th:if="${reservation.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">✅ Đã xác nhận hẹn</span>
+                                <span th:if="${reservation.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">🎉 Đã hoàn tất</span>
+                                <span th:if="${reservation.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">❌ Đã hủy</span>
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+                                <div>Thời gian hẹn: <strong th:text="${#temporals.format(reservation.consultationDate, 'dd/MM/yyyy HH:mm')}">12/11/2026 09:00</strong></div>
+                                <div>Nội dung yêu cầu: <i th:text="${reservation.consultationNotes != null ? reservation.consultationNotes : 'Hỗ trợ lộ trình'}">Tư vấn hành lý</i></div>
+                                <div th:if="${reservation.assignedConsultant != null}">
+                                    Chuyên viên hỗ trợ: <strong th:text="${reservation.assignedConsultant.fullName}">Nguyễn Thị Mai</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="font-size: 12px; color: #0369a1; margin: 0;">
+                            ✨ Chuyên viên VietTravel Hub sẽ liên hệ qua SĐT <strong th:text="${reservation.customerPhone}">0912345678</strong> đúng giờ hẹn.
+                        </p>
+                    </div>
+
+                    <!-- TRƯỜNG HỢP 2: CHƯA ĐĂNG KÝ -> HIỂN THỊ FORM ĐĂNG KÝ NHANH -->
+                    <div th:if="${!reservation.hasConsultation}">
+                        <p style="font-size: 13px; color: #334155; line-height: 1.5; margin-bottom: 14px;">
+                            Quý khách vừa tạo đơn đặt vé! Cần tư vấn thêm về suất ăn, hành lý ký gửi, chọn vị trí ngồi đẹp hoặc hóa đơn VAT cho đoàn? Hãy chọn giờ để chuyên viên liên hệ:
+                        </p>
+                        <form method="post" th:action="@{'/reservations/' + ${reservation.bookingCode} + '/consultation'}">
+                            <div style="margin-bottom: 10px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Thời gian hẹn tư vấn (08:00 - 17:30 T2-T7) *</label>
+                                <input type="datetime-local" name="consultationDate" class="form-control" style="font-size: 13px; padding: 8px 10px;" required />
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Nội dung cần tư vấn</label>
+                                <input type="text" name="notes" class="form-control" placeholder="Ví dụ: Tư vấn mua thêm 20kg hành lý ký gửi, xuất hóa đơn..." style="font-size: 13px; padding: 8px 10px;" />
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; padding: 10px; font-weight: 700; background: #0284c7; border-color: #0284c7;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                Đăng Ký Tư Vấn Chuyến Đi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- PAYMENT BOX (NẾU CHƯA THANH TOÁN) -->
                 <div th:if="${reservation.status.name() == 'CREATED'}" class="card no-print" style="margin-bottom: 24px;">
                     <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">

@@ -1,9 +1,10 @@
 package com.dulich.ticketmanagement.service;
 
-import com.dulich.ticketmanagement.entity.Appointment;
+import com.dulich.ticketmanagement.entity.Reservation;
 import com.dulich.ticketmanagement.entity.enums.AppointmentStatus;
+import com.dulich.ticketmanagement.entity.enums.ReservationStatus;
 import com.dulich.ticketmanagement.entity.enums.TransportType;
-import com.dulich.ticketmanagement.repository.AppointmentRepository;
+import com.dulich.ticketmanagement.repository.ReservationRepository;
 import com.dulich.ticketmanagement.repository.UserRepository;
 import com.dulich.ticketmanagement.service.impl.AppointmentServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -14,17 +15,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Kiểm thử Nghiệp vụ đặt lịch hẹn tư vấn (AppointmentService)")
+@DisplayName("Kiểm thử Nghiệp vụ đặt lịch hẹn tư vấn theo đơn vé (AppointmentService)")
 class AppointmentServiceTest {
 
     @Mock
-    private AppointmentRepository appointmentRepository;
+    private ReservationRepository reservationRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -36,32 +38,31 @@ class AppointmentServiceTest {
     private AppointmentServiceImpl appointmentService;
 
     @Test
-    @DisplayName("Tạo lịch hẹn mới: Tự động phát sinh mã hẹn APT và trạng thái mặc định PENDING")
-    void testCreateAppointment() {
-        Appointment apt = new Appointment();
-        apt.setCustomerName("Lê Hoàng Long");
-        apt.setPhone("0988776655");
-        apt.setEmail("long.le@gmail.com");
-        apt.setTransportType(TransportType.AIR);
+    @DisplayName("Đăng ký hẹn tư vấn sau khi đặt vé: Lưu thông tin tư vấn vào DonDatCho và trạng thái PENDING")
+    void testScheduleConsultation() {
+        Reservation reservation = new Reservation();
+        reservation.setId(1L);
+        reservation.setBookingCode("RES-202611-0001");
+        reservation.setCustomerName("Lê Hoàng Long");
+        reservation.setCustomerPhone("0988776655");
+        reservation.setCustomerEmail("long.le@gmail.com");
+        reservation.setTransportType(TransportType.AIR);
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+
         LocalDateTime validDate = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0);
         if (validDate.getDayOfWeek() == java.time.DayOfWeek.SUNDAY) {
             validDate = validDate.plusDays(1);
         }
-        apt.setPreferredDate(validDate);
-        apt.setNotes("Tư vấn đặt vé máy bay đoàn");
 
-        when(appointmentRepository.save(any(Appointment.class))).thenAnswer(i -> {
-            Appointment saved = i.getArgument(0);
-            saved.setId(1L);
-            return saved;
-        });
+        when(reservationRepository.findByBookingCode("RES-202611-0001")).thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(any(Reservation.class))).thenAnswer(i -> i.getArgument(0));
 
-        Appointment result = appointmentService.createAppointment(apt);
+        Reservation result = appointmentService.scheduleConsultation("RES-202611-0001", validDate, "Tư vấn nâng hạng ghế");
 
         assertNotNull(result);
-        assertNotNull(result.getAppointmentCode());
-        assertTrue(result.getAppointmentCode().startsWith("APT-"));
-        assertEquals(AppointmentStatus.PENDING, result.getStatus());
-        verify(appointmentRepository, times(1)).save(any(Appointment.class));
+        assertTrue(result.getHasConsultation());
+        assertEquals(AppointmentStatus.PENDING, result.getConsultationStatus());
+        assertEquals("Tư vấn nâng hạng ghế", result.getConsultationNotes());
+        verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 }

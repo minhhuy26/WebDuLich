@@ -4,21 +4,20 @@
 Ứng dụng web quản lý đặt vé du lịch và đăng ký lịch hẹn tư vấn phục vụ **2 nhóm phương tiện vận tải trọng yếu**: **1. Vé máy bay (Air), 2. Vé tàu hỏa (Train)** theo đúng Rubric IV (2/4 Nhóm Phương tiện) trong đề cương đồ án tốt nghiệp của Giảng viên.
 Xây dựng trên nền tảng **Java 17, Spring Boot 3.2.5, Spring Web MVC, Spring Security 6, Spring Data JPA, Thymeleaf và Microsoft SQL Server**.
 
-> **Kiến trúc CSDL tinh gọn chuẩn 3NF gồm đúng 5 BẢNG CỐT LÕI**, tuân thủ 100% tài liệu và rubric chấm điểm của Giảng viên.
+> **Kiến trúc CSDL tinh gọn chuẩn 3NF gồm đúng 4 BẢNG CỐT LÕI**, tối ưu hóa loại bỏ bảng `LichHen` riêng biệt và tích hợp trực tiếp thông tin tư vấn vào Đơn Đặt Chỗ (lịch hẹn tư vấn chỉ xuất hiện sau khi khách đặt vé xong).
 
 ---
 
-## 1. Thiết Kế Cơ Sở Dữ Liệu 5 Bảng (SQL Server)
+## 1. Thiết Kế Cơ Sở Dữ Liệu 4 Bảng Cốt Lõi Tinh Gọn (SQL Server)
 
-Hệ thống quy tụ toàn bộ dữ liệu vào **đúng 5 bảng có liên kết chặt chẽ**, loại bỏ tình trạng phân mảnh bảng:
+Hệ thống quy tụ toàn bộ dữ liệu vào **đúng 4 bảng có liên kết chặt chẽ**, loại bỏ tình trạng phân mảnh bảng và trùng lặp dữ liệu:
 
 | STT | Bảng | Khóa chính / Khóa ngoại | Chức năng chính trong hệ thống |
 | :---: | :--- | :--- | :--- |
-| **1** | **`users`** | `PK: id` | Tài khoản & Phân quyền RBAC 4 vai trò: `ROLE_TRAVELER`, `ROLE_AGENT`, `ROLE_OPERATOR`, `ROLE_ADMIN`. |
-| **2** | **`appointments`**| `PK: id`<br>`FK: user_id -> users`<br>`FK: assigned_operator_id -> users` | Tiếp nhận đăng ký lịch hẹn tư vấn trực tiếp (Workflow 4), gán nhân viên phụ trách. |
-| **3** | **`reservations`**| `PK: id`<br>`FK: user_id -> users` | Đơn đặt giữ chỗ (Workflow 1). Vòng đời: `CREATED` (giữ 15p) &rarr; `CONFIRMED` &rarr; `CANCELLED`. |
-| **4** | **`tickets`** | `PK: id`<br>`FK: reservation_id -> reservations` | Kho chỗ ngồi khả dụng & chi tiết vé của từng hành khách, lưu số ghế, giá vé, mã vé điện tử và dữ liệu ảnh QR Code. |
-| **5** | **`trans_details`**| `PK: id`<br>`FK: reservation_id -> reservations` | Lịch sử giao dịch thanh toán (Workflow 3): VNPAY-QR, Thẻ, Chuyển khoản, lưu vết đối soát. |
+| **1** | **`NguoiDung`** | `PK: id` | Tài khoản & Phân quyền RBAC 4 vai trò: `ROLE_TRAVELER`, `ROLE_AGENT`, `ROLE_OPERATOR`, `ROLE_ADMIN`. |
+| **2** | **`DonDatCho`** | `PK: id`<br>`FK: nguoi_dung_id -> NguoiDung`<br>`FK: nhan_vien_tu_van_id -> NguoiDung` | Đơn đặt giữ chỗ (Workflow 1). Vòng đời: `CREATED` (giữ 15p) &rarr; `CONFIRMED` &rarr; `CANCELLED`. **Tích hợp tính năng Đăng ký lịch hẹn tư vấn sau khi đặt vé** (`co_hen_tu_van`, `ngay_hen_tu_van`, `ghi_chu_tu_van`, `trang_thai_tu_van`). |
+| **3** | **`Ve`** | `PK: id`<br>`FK: don_dat_cho_id -> DonDatCho` | Kho chỗ ngồi khả dụng & chi tiết vé của từng hành khách, lưu số ghế, giá vé, mã vé điện tử và dữ liệu ảnh QR Code. |
+| **4** | **`GiaoDich`** | `PK: id`<br>`FK: don_dat_cho_id -> DonDatCho` | Lịch sử giao dịch thanh toán (Workflow 3): VNPAY-QR, VietQR, Thẻ, Chuyển khoản, lưu vết đối soát tài chính. |
 
 ---
 

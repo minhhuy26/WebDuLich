@@ -1,21 +1,22 @@
 package com.dulich.ticketmanagement.service;
 
-import com.dulich.ticketmanagement.entity.Appointment;
+import com.dulich.ticketmanagement.entity.Reservation;
 import com.dulich.ticketmanagement.entity.enums.AppointmentStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AppointmentService {
 
-    Appointment createAppointment(Appointment appointment);
+    Reservation scheduleConsultation(String bookingCode, LocalDateTime preferredDate, String notes);
 
-    Appointment findByCode(String code);
+    Reservation updateStatus(Long reservationId, AppointmentStatus status, Long operatorId);
 
-    List<Appointment> findAll();
+    List<Reservation> findAll();
 
-    List<Appointment> findByPhone(String phone);
+    List<Reservation> findByPhone(String phone);
 
-    Appointment updateStatus(Long id, AppointmentStatus status, Long operatorId);
+    Reservation findByBookingCode(String bookingCode);
 
     long count();
 }

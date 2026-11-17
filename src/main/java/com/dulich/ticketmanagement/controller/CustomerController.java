@@ -1,10 +1,8 @@
 package com.dulich.ticketmanagement.controller;
 
-import com.dulich.ticketmanagement.entity.Appointment;
 import com.dulich.ticketmanagement.entity.Reservation;
 import com.dulich.ticketmanagement.entity.User;
 import com.dulich.ticketmanagement.entity.enums.ReservationStatus;
-import com.dulich.ticketmanagement.repository.AppointmentRepository;
 import com.dulich.ticketmanagement.repository.ReservationRepository;
 import com.dulich.ticketmanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +22,12 @@ public class CustomerController {
 
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
-    private final AppointmentRepository appointmentRepository;
 
     @Autowired
     public CustomerController(UserRepository userRepository,
-                              ReservationRepository reservationRepository,
-                              AppointmentRepository appointmentRepository) {
+                              ReservationRepository reservationRepository) {
         this.userRepository = userRepository;
         this.reservationRepository = reservationRepository;
-        this.appointmentRepository = appointmentRepository;
     }
 
     @GetMapping
@@ -42,7 +37,7 @@ public class CustomerController {
         User currentUser = userRepository.findByUsername(username).orElse(null);
 
         List<Reservation> reservations = new ArrayList<>();
-        List<Appointment> appointments = new ArrayList<>();
+        List<Reservation> appointments = new ArrayList<>();
         BigDecimal totalSpent = BigDecimal.ZERO;
         long confirmedCount = 0;
         long holdingCount = 0;
@@ -53,7 +48,7 @@ public class CustomerController {
                 reservations = reservationRepository.findByCustomerPhoneOrderByCreatedAtDesc(currentUser.getPhone());
             }
             if (currentUser.getPhone() != null) {
-                appointments = appointmentRepository.findByPhoneOrderByCreatedAtDesc(currentUser.getPhone());
+                appointments = reservationRepository.findByHasConsultationTrueAndCustomerPhoneOrderByCreatedAtDesc(currentUser.getPhone());
             }
 
             for (Reservation r : reservations) {

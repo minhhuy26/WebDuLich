@@ -1,6 +1,7 @@
 package com.dulich.ticketmanagement.repository;
 
 import com.dulich.ticketmanagement.entity.Reservation;
+import com.dulich.ticketmanagement.entity.enums.AppointmentStatus;
 import com.dulich.ticketmanagement.entity.enums.ReservationStatus;
 import com.dulich.ticketmanagement.entity.enums.TransportType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,4 +42,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT COALESCE(SUM(r.totalAmount), 0) FROM Reservation r WHERE r.status = 'CONFIRMED'")
     java.math.BigDecimal calculateTotalRevenue();
+
+    List<Reservation> findByHasConsultationTrueOrderByCreatedAtDesc();
+
+    List<Reservation> findByHasConsultationTrueAndConsultationStatusOrderByCreatedAtDesc(AppointmentStatus status);
+
+    List<Reservation> findByHasConsultationTrueAndCustomerPhoneOrderByCreatedAtDesc(String customerPhone);
+
+    long countByHasConsultationTrue();
+
+    long countByHasConsultationTrueAndConsultationStatus(AppointmentStatus status);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.hasConsultation = true AND r.consultationDate >= :startDate AND r.consultationDate <= :endDate")
+    long countConsultationsOnDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

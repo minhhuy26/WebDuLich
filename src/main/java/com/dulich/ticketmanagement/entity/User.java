@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "NguoiDung")
 public class User {
 
     @Id
@@ -18,16 +18,16 @@ public class User {
 
     @NotBlank(message = "Tên đăng nhập không được để trống")
     @Size(min = 3, max = 50, message = "Tên đăng nhập từ 3 đến 50 ký tự")
-    @Column(name = "username", nullable = false, unique = true, length = 50)
+    @Column(name = "ten_dang_nhap", nullable = false, unique = true, length = 50)
     private String username;
 
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 6, message = "Mật khẩu tối thiểu 6 ký tự")
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "mat_khau", nullable = false, length = 255)
     private String password;
 
     @NotBlank(message = "Họ và tên không được để trống")
-    @Column(name = "full_name", nullable = false, length = 100)
+    @Column(name = "ho_ten", nullable = false, length = 100)
     private String fullName;
 
     @NotBlank(message = "Email không được để trống")
@@ -35,17 +35,17 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "phone", length = 20)
+    @Column(name = "so_dien_thoai", length = 20)
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 30)
+    @Column(name = "vai_tro", nullable = false, length = 30)
     private UserRole role = UserRole.ROLE_TRAVELER;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "trang_thai", nullable = false)
     private Boolean status = true;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -26,29 +26,29 @@
                 </h1>
 
                 <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">
-                    Hệ thống đã tiếp nhận yêu cầu và gửi thông báo tới bộ phận Điều hành / Tư vấn viên.
+                    Lịch hẹn tư vấn đã được ghi nhận trực tiếp vào Đơn Đặt Vé của quý khách. Chuyên viên sẽ gọi điện hỗ trợ đúng giờ hẹn.
                 </p>
 
-                <!-- APPOINTMENT CODE BADGE -->
+                <!-- BOOKING CODE BADGE -->
                 <div style="background: var(--surface-alt); padding: 18px; border-radius: var(--radius-md); border: 2px dashed var(--accent); margin-bottom: 24px;">
-                    <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Mã Số Cuộc Hẹn Của Bạn</div>
+                    <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Mã Đơn Đặt Vé Của Bạn</div>
                     <div style="font-size: 24px; font-weight: 900; color: var(--accent); font-family: var(--font-mono);"
-                         th:text="${appointment.appointmentCode}">
-                        APT-202611-0001
+                         th:text="${appointment.bookingCode}">
+                        RES-202611-0001
                     </div>
                 </div>
 
                 <div style="text-align: left; font-size: 14px; line-height: 1.8; margin-bottom: 28px; background: #f8fafc; padding: 16px; border-radius: 8px;">
                     <div>Họ và tên: <strong th:text="${appointment.customerName}">Trần Văn An</strong></div>
                     <div>Số điện thoại: <strong th:text="${appointment.phone}">0912345678</strong></div>
-                    <div>Thời gian hẹn: <strong th:text="${#temporals.format(appointment.preferredDate, 'HH:mm - EEEE, dd/MM/yyyy')}">09:00 - Thứ Tư, 11/11/2026</strong></div>
-                    <div>Phương tiện quan tâm: <strong th:text="${appointment.transportType.fullName}">Vé máy bay</strong></div>
+                    <div>Thời gian hẹn tư vấn: <strong th:text="${#temporals.format(appointment.preferredDate, 'HH:mm - dd/MM/yyyy')}">09:00 - 11/11/2026</strong></div>
+                    <div>Nội dung yêu cầu: <i th:text="${appointment.notes != null ? appointment.notes : 'Tư vấn hành trình'}">Tư vấn chọn chỗ ngồi</i></div>
                     <div>Trạng thái: <span class="badge badge-warning" th:text="${appointment.status.displayName}">Chờ tiếp nhận</span></div>
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: center;">
-                    <a href="/" class="btn btn-primary">Về Trang Chủ</a>
-                    <a th:href="@{/catalog(type=${appointment.transportType})}" class="btn btn-outline">Xem Vé Khả Dụng</a>
+                    <a th:href="@{'/reservations/' + ${appointment.bookingCode}}" class="btn btn-primary">Xem Chi Tiết Đơn Vé &amp; QR Code</a>
+                    <a href="/" class="btn btn-outline">Về Trang Chủ</a>
                 </div>
             </div>
         </div>

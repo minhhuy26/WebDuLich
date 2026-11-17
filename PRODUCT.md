@@ -32,7 +32,7 @@ Khác với các ứng dụng du lịch tổng hợp bị phân tán hoặc các
 
 - **Hàng không:** Tra cứu chuyến bay 1 chiều & khứ hồi, phân loại hạng vé (Phổ thông, Đặc biệt, Thương gia), giữ chỗ 15 phút.
 - **Đường sắt:** Tra cứu 11 ga dọc trục Bắc - Nam, phân loại toa (Ghế mềm điều hòa, Giường nằm K6, Giường nằm K4 VIP), chọn vị trí chính xác trên sơ đồ toa tàu, chính sách giảm giá đối tượng (Trẻ em, Sinh viên, Người cao tuổi), giữ chỗ 10 phút.
-- **Tư vấn du lịch:** Đặt lịch hẹn chuyên viên tư vấn vé đoàn và du lịch 24/7.
+- **Tư vấn du lịch sau đặt vé:** Đặt lịch hẹn chuyên viên tư vấn hỗ trợ hành trình, nâng hạng ghế, hành lý và hóa đơn sau khi hoàn tất đặt vé.
 - **Quản lý đơn hàng:** Theo dõi tình trạng vé (Đang giữ chỗ, Đã thanh toán, Đã hủy, Hoàn tất), tra cứu mã đặt chỗ không cần đăng nhập hoặc qua trang cá nhân.
 
 ## Brand Commitments

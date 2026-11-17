@@ -46,42 +46,46 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>Mã Cuộc Hẹn</th>
+                            <th>Mã Đơn Vé</th>
                             <th>Khách Hàng</th>
                             <th>SĐT / Email</th>
                             <th>Thời Gian Hẹn</th>
                             <th>Phương Tiện</th>
-                            <th>Nhân Viên Phụ Trách</th>
+                            <th>Chuyên Viên Phụ Trách</th>
                             <th>Trạng Thái</th>
-                            <th>Ghi Chú</th>
+                            <th>Yêu Cầu Tư Vấn</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(appointments)}">
                             <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
-                                Chưa có cuộc hẹn tư vấn nào.
+                                Chưa có đơn vé nào đăng ký lịch hẹn tư vấn.
                             </td>
                         </tr>
                         <tr th:each="a : ${appointments}">
-                            <td><strong style="font-family: var(--font-mono); color: var(--primary);" th:text="${a.appointmentCode}">APT-001</strong></td>
+                            <td>
+                                <a th:href="@{'/reservations/' + ${a.bookingCode}}" style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); text-decoration: none;">
+                                    <span th:text="${a.bookingCode}">RES-001</span> &nearr;
+                                </a>
+                            </td>
                             <td><strong th:text="${a.customerName}">Trần Văn An</strong></td>
                             <td>
-                                <div th:text="${a.phone}">0912345678</div>
-                                <small style="color: var(--text-muted);" th:text="${a.email != null ? a.email : ''}"></small>
+                                <div th:text="${a.customerPhone}">0912345678</div>
+                                <small style="color: var(--text-muted);" th:text="${a.customerEmail != null ? a.customerEmail : ''}"></small>
                             </td>
-                            <td><strong th:text="${#temporals.format(a.preferredDate, 'dd/MM/yyyy HH:mm')}">11/11/2026 09:00</strong></td>
+                            <td><strong th:text="${#temporals.format(a.consultationDate, 'dd/MM/yyyy HH:mm')}">11/11/2026 09:00</strong></td>
                             <td><span class="badge badge-primary" th:text="${a.transportType.shortName}">Máy bay</span></td>
                             <td>
-                                <span th:if="${a.assignedOperator != null}" th:text="${a.assignedOperator.fullName}">Nguyễn Thị Mai</span>
-                                <span th:if="${a.assignedOperator == null}" style="color: var(--text-muted); font-size: 12px;">(Chưa phân công)</span>
+                                <span th:if="${a.assignedConsultant != null}" th:text="${a.assignedConsultant.fullName}">Nguyễn Thị Mai</span>
+                                <span th:if="${a.assignedConsultant == null}" style="color: var(--text-muted); font-size: 12px; font-style: italic;">(Chưa phân công)</span>
                             </td>
                             <td>
-                                <span th:if="${a.status.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
-                                <span th:if="${a.status.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
-                                <span th:if="${a.status.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
-                                <span th:if="${a.status.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
+                                <span th:if="${a.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
+                                <span th:if="${a.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
+                                <span th:if="${a.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
                             </td>
-                            <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;" th:text="${a.notes != null ? a.notes : '-'}">-</td>
+                            <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;" th:text="${a.consultationNotes != null ? a.consultationNotes : '-'}">-</td>
                         </tr>
                     </tbody>
                 </table>

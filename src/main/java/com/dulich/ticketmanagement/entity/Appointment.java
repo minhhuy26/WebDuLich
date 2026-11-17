@@ -2,74 +2,61 @@ package com.dulich.ticketmanagement.entity;
 
 import com.dulich.ticketmanagement.entity.enums.AppointmentStatus;
 import com.dulich.ticketmanagement.entity.enums.TransportType;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "appointments")
+/**
+ * Model biểu mẫu tiếp nhận thông tin lịch hẹn tư vấn sau khi khách đặt vé xong.
+ * Không còn là bảng riêng biệt trong CSDL (CSDL tinh gọn chuẩn 4 bảng).
+ * Toàn bộ thông tin được đồng bộ trực tiếp vào bảng DonDatCho (Reservation).
+ */
 public class Appointment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Mã lịch hẹn không được để trống")
-    @Column(name = "appointment_code", nullable = false, unique = true, length = 30)
-    private String appointmentCode;
+    @NotBlank(message = "Vui lòng nhập hoặc chọn mã đơn đặt vé của quý khách")
+    private String bookingCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @NotBlank(message = "Họ và tên khách hàng không được để trống")
-    @Column(name = "customer_name", nullable = false, length = 100)
     private String customerName;
-
-    @NotBlank(message = "Số điện thoại không được để trống")
-    @Column(name = "phone", nullable = false, length = 20)
     private String phone;
-
-    @Column(name = "email", length = 100)
     private String email;
 
     @NotNull(message = "Vui lòng chọn thời gian hẹn mong muốn")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    @Column(name = "preferred_date", nullable = false)
     private LocalDateTime preferredDate;
 
-    @NotNull(message = "Vui lòng chọn loại hình phương tiện quan tâm")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "transport_type", nullable = false, length = 20)
     private TransportType transportType = TransportType.AIR;
-
-    @Column(name = "notes", length = 500)
     private String notes;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
     private AppointmentStatus status = AppointmentStatus.PENDING;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_operator_id")
     private User assignedOperator;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        if (this.appointmentCode == null || this.appointmentCode.trim().isEmpty()) {
-            this.appointmentCode = "APT-" + System.currentTimeMillis() % 1000000;
-        }
-    }
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Appointment() {
+    }
+
+    public Appointment(String bookingCode, LocalDateTime preferredDate, String notes) {
+        this.bookingCode = bookingCode;
+        this.preferredDate = preferredDate;
+        this.notes = notes;
+    }
+
+    public static Appointment fromReservation(Reservation r) {
+        Appointment a = new Appointment();
+        a.setId(r.getId());
+        a.setBookingCode(r.getBookingCode());
+        a.setCustomerName(r.getCustomerName());
+        a.setPhone(r.getCustomerPhone());
+        a.setEmail(r.getCustomerEmail());
+        a.setPreferredDate(r.getConsultationDate());
+        a.setTransportType(r.getTransportType());
+        a.setNotes(r.getConsultationNotes());
+        a.setStatus(r.getConsultationStatus());
+        a.setAssignedOperator(r.getAssignedConsultant());
+        a.setCreatedAt(r.getCreatedAt());
+        return a;
     }
 
     public Long getId() {
@@ -80,20 +67,12 @@ public class Appointment {
         this.id = id;
     }
 
-    public String getAppointmentCode() {
-        return appointmentCode;
+    public String getBookingCode() {
+        return bookingCode;
     }
 
-    public void setAppointmentCode(String appointmentCode) {
-        this.appointmentCode = appointmentCode;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setBookingCode(String bookingCode) {
+        this.bookingCode = bookingCode;
     }
 
     public String getCustomerName() {

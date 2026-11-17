@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "trans_details")
+@Table(name = "GiaoDich")
 public class TransDetail {
 
     @Id
@@ -19,34 +19,34 @@ public class TransDetail {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @JoinColumn(name = "don_dat_cho_id", nullable = false)
     private Reservation reservation;
 
     @NotBlank(message = "Mã thanh toán không được để trống")
-    @Column(name = "payment_code", nullable = false, unique = true, length = 50)
+    @Column(name = "ma_giao_dich", nullable = false, unique = true, length = 50)
     private String paymentCode;
 
     @NotNull
-    @Column(name = "amount", nullable = false, precision = 18, scale = 2)
+    @Column(name = "so_tien", nullable = false, precision = 18, scale = 2)
     private BigDecimal amount;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false, length = 30)
+    @Column(name = "phuong_thuc", nullable = false, length = 30)
     private PaymentMethod paymentMethod = PaymentMethod.VNPAY;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", nullable = false, length = 20)
+    @Column(name = "trang_thai", nullable = false, length = 20)
     private PaymentStatus paymentStatus = PaymentStatus.SUCCESS;
 
-    @Column(name = "transaction_reference", length = 100)
+    @Column(name = "ma_tham_chieu", length = 100)
     private String transactionReference;
 
-    @Column(name = "note", length = 255)
+    @Column(name = "ghi_chu", length = 255)
     private String note;
 
-    @Column(name = "transaction_time", nullable = false)
+    @Column(name = "thoi_gian_giao_dich", nullable = false)
     private LocalDateTime transactionTime;
 
     @PrePersist

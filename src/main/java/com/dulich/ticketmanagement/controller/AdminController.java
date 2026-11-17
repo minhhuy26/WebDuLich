@@ -26,7 +26,6 @@ public class AdminController {
     private final ReservationRepository reservationRepository;
     private final ReservationService reservationService;
     private final TicketRepository ticketRepository;
-    private final AppointmentRepository appointmentRepository;
     private final AppointmentService appointmentService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -35,14 +34,12 @@ public class AdminController {
     public AdminController(ReservationRepository reservationRepository,
                            ReservationService reservationService,
                            TicketRepository ticketRepository,
-                           AppointmentRepository appointmentRepository,
                            AppointmentService appointmentService,
                            UserRepository userRepository,
                            PasswordEncoder passwordEncoder) {
         this.reservationRepository = reservationRepository;
         this.reservationService = reservationService;
         this.ticketRepository = ticketRepository;
-        this.appointmentRepository = appointmentRepository;
         this.appointmentService = appointmentService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -55,7 +52,7 @@ public class AdminController {
         long confirmedCount = reservationRepository.countByStatus(ReservationStatus.CONFIRMED);
         long holdingCount = reservationRepository.countByStatus(ReservationStatus.CREATED);
         BigDecimal totalRevenue = reservationRepository.calculateTotalRevenue();
-        long totalAppointments = appointmentRepository.count();
+        long totalAppointments = appointmentService.count();
         long totalTickets = ticketRepository.count();
         long totalUsers = userRepository.count();
 
@@ -64,7 +61,7 @@ public class AdminController {
             recentReservations = recentReservations.subList(0, 10);
         }
 
-        List<Appointment> recentAppointments = appointmentRepository.findAllWithDetails();
+        List<Reservation> recentAppointments = appointmentService.findAll();
         if (recentAppointments.size() > 5) {
             recentAppointments = recentAppointments.subList(0, 5);
         }
@@ -156,10 +153,10 @@ public class AdminController {
         return "redirect:/admin/tickets";
     }
 
-    // 4. QUẢN LÝ LỊCH HẸN TƯ VẤN (APPOINTMENTS)
+    // 4. QUẢN LÝ LỊCH HẸN TƯ VẤN (APPOINTMENTS GẮN LIỀN VỚI ĐƠN ĐẶT VÉ)
     @GetMapping("/appointments")
     public String manageAppointments(Model model) {
-        model.addAttribute("appointments", appointmentRepository.findAllWithDetails());
+        model.addAttribute("appointments", appointmentService.findAll());
         model.addAttribute("operators", userRepository.findByRole(UserRole.ROLE_OPERATOR));
         model.addAttribute("statuses", AppointmentStatus.values());
         return "admin/manage_appointments";

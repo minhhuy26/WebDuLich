@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tickets")
+@Table(name = "Ve")
 public class Ticket {
 
     @Id
@@ -19,89 +19,89 @@ public class Ticket {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id")
+    @JoinColumn(name = "don_dat_cho_id")
     private Reservation reservation;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "transport_type", nullable = false, length = 20)
+    @Column(name = "loai_phuong_tien", nullable = false, length = 20)
     private TransportType transportType;
 
     @NotBlank
-    @Column(name = "vehicle_code", nullable = false, length = 50)
+    @Column(name = "so_hieu_chuyen", nullable = false, length = 50)
     private String vehicleCode;
 
     @NotBlank
-    @Column(name = "vehicle_name", nullable = false, length = 100)
+    @Column(name = "ten_phuong_tien", nullable = false, length = 100)
     private String vehicleName;
 
     @NotBlank
-    @Column(name = "route_info", nullable = false, length = 200)
+    @Column(name = "tuyen_duong", nullable = false, length = 200)
     private String routeInfo;
 
     @NotBlank
-    @Column(name = "departure_place", nullable = false, length = 100)
+    @Column(name = "diem_di", nullable = false, length = 100)
     private String departurePlace;
 
     @NotBlank
-    @Column(name = "arrival_place", nullable = false, length = 100)
+    @Column(name = "diem_den", nullable = false, length = 100)
     private String arrivalPlace;
 
     @NotNull
-    @Column(name = "departure_time", nullable = false)
+    @Column(name = "gio_di", nullable = false)
     private LocalDateTime departureTime;
 
     @NotNull
-    @Column(name = "arrival_time", nullable = false)
+    @Column(name = "gio_den", nullable = false)
     private LocalDateTime arrivalTime;
 
     @NotBlank
-    @Column(name = "seat_number", nullable = false, length = 50, columnDefinition = "NVARCHAR(50)")
+    @Column(name = "so_ghe", nullable = false, length = 50, columnDefinition = "NVARCHAR(50)")
     private String seatNumber;
 
     @NotBlank
-    @Column(name = "seat_class", nullable = false, length = 50)
+    @Column(name = "hang_ve", nullable = false, length = 50)
     private String seatClass;
 
-    @Column(name = "passenger_name", length = 100)
+    @Column(name = "ten_hanh_khach", length = 100)
     private String passengerName;
 
-    @Column(name = "id_card", length = 30)
+    @Column(name = "so_cccd", length = 30)
     private String idCard;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "passenger_type", nullable = false, length = 20)
+    @Column(name = "loai_khach", nullable = false, length = 20)
     private PassengerType passengerType = PassengerType.ADULT;
 
     @NotNull
-    @Column(name = "base_price", nullable = false, precision = 18, scale = 2)
+    @Column(name = "gia_goc", nullable = false, precision = 18, scale = 2)
     private BigDecimal basePrice = BigDecimal.ZERO;
 
     @NotNull
-    @Column(name = "service_fee", nullable = false, precision = 18, scale = 2)
+    @Column(name = "phi_dich_vu", nullable = false, precision = 18, scale = 2)
     private BigDecimal serviceFee = BigDecimal.ZERO;
 
     @NotNull
-    @Column(name = "extra_fee", nullable = false, precision = 18, scale = 2)
+    @Column(name = "phu_phi", nullable = false, precision = 18, scale = 2)
     private BigDecimal extraFee = BigDecimal.ZERO;
 
     @NotNull
-    @Column(name = "final_price", nullable = false, precision = 18, scale = 2)
+    @Column(name = "gia_cuoi", nullable = false, precision = 18, scale = 2)
     private BigDecimal finalPrice = BigDecimal.ZERO;
 
-    @Column(name = "ticket_code", length = 50)
+    @Column(name = "ma_ve_dien_tu", length = 50)
     private String ticketCode;
 
-    @Column(name = "qr_code_data", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "du_lieu_qr", columnDefinition = "NVARCHAR(MAX)")
     private String qrCodeData;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "trang_thai", nullable = false, length = 20)
     private TicketStatus status = TicketStatus.AVAILABLE;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

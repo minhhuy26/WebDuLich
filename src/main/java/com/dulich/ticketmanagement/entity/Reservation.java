@@ -1,5 +1,6 @@
 package com.dulich.ticketmanagement.entity;
 
+import com.dulich.ticketmanagement.entity.enums.AppointmentStatus;
 import com.dulich.ticketmanagement.entity.enums.ReservationStatus;
 import com.dulich.ticketmanagement.entity.enums.TransportType;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "reservations")
+@Table(name = "DonDatCho")
 public class Reservation {
 
     @Id
@@ -21,72 +22,89 @@ public class Reservation {
     private Long id;
 
     @NotBlank(message = "Mã đặt chỗ không được để trống")
-    @Column(name = "booking_code", nullable = false, unique = true, length = 30)
+    @Column(name = "ma_dat_cho", nullable = false, unique = true, length = 30)
     private String bookingCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "nguoi_dung_id")
     private User user;
 
     @NotBlank(message = "Tên khách hàng không được để trống")
-    @Column(name = "customer_name", nullable = false, length = 100)
+    @Column(name = "ten_khach_hang", nullable = false, length = 100)
     private String customerName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Column(name = "customer_phone", nullable = false, length = 20)
+    @Column(name = "so_dien_thoai", nullable = false, length = 20)
     private String customerPhone;
 
     @NotBlank(message = "Email không được để trống")
-    @Column(name = "customer_email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100)
     private String customerEmail;
 
     @NotNull(message = "Loại phương tiện không được để trống")
     @Enumerated(EnumType.STRING)
-    @Column(name = "transport_type", nullable = false, length = 20)
+    @Column(name = "loai_phuong_tien", nullable = false, length = 20)
     private TransportType transportType;
 
     @NotBlank(message = "Điểm khởi hành không được để trống")
-    @Column(name = "departure_place", nullable = false, length = 100)
+    @Column(name = "diem_di", nullable = false, length = 100)
     private String departurePlace;
 
     @NotBlank(message = "Điểm đến không được để trống")
-    @Column(name = "arrival_place", nullable = false, length = 100)
+    @Column(name = "diem_den", nullable = false, length = 100)
     private String arrivalPlace;
 
     @NotNull(message = "Ngày khởi hành không được để trống")
-    @Column(name = "departure_date", nullable = false)
+    @Column(name = "ngay_di", nullable = false)
     private LocalDateTime departureDate;
 
-    @Column(name = "return_date")
+    @Column(name = "ngay_ve")
     private LocalDateTime returnDate;
 
-    @Column(name = "is_round_trip", nullable = false)
+    @Column(name = "la_khu_hoi", nullable = false)
     private Boolean isRoundTrip = false;
 
     @Min(value = 1, message = "Số lượng hành khách tối thiểu là 1")
-    @Column(name = "passenger_count", nullable = false)
+    @Column(name = "so_luong_khach", nullable = false)
     private Integer passengerCount = 1;
 
     @NotNull
-    @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
+    @Column(name = "tong_tien", nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "trang_thai", nullable = false, length = 20)
     private ReservationStatus status = ReservationStatus.CREATED;
 
     @NotNull
-    @Column(name = "hold_expires_at", nullable = false)
+    @Column(name = "han_giu_cho", nullable = false)
     private LocalDateTime holdExpiresAt;
 
-    @Column(name = "cancel_reason", length = 255)
+    @Column(name = "ly_do_huy", length = 255)
     private String cancelReason;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "co_hen_tu_van", nullable = false)
+    private Boolean hasConsultation = false;
+
+    @Column(name = "ngay_hen_tu_van")
+    private LocalDateTime consultationDate;
+
+    @Column(name = "ghi_chu_tu_van", length = 500)
+    private String consultationNotes;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trang_thai_tu_van", nullable = false, length = 20)
+    private AppointmentStatus consultationStatus = AppointmentStatus.NONE;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nhan_vien_tu_van_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User assignedConsultant;
+
+    @Column(name = "ngay_tao", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "ngay_cap_nhat")
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
@@ -288,5 +306,45 @@ public class Reservation {
     public void addTransDetail(TransDetail detail) {
         transDetails.add(detail);
         detail.setReservation(this);
+    }
+
+    public Boolean getHasConsultation() {
+        return hasConsultation;
+    }
+
+    public void setHasConsultation(Boolean hasConsultation) {
+        this.hasConsultation = hasConsultation;
+    }
+
+    public LocalDateTime getConsultationDate() {
+        return consultationDate;
+    }
+
+    public void setConsultationDate(LocalDateTime consultationDate) {
+        this.consultationDate = consultationDate;
+    }
+
+    public String getConsultationNotes() {
+        return consultationNotes;
+    }
+
+    public void setConsultationNotes(String consultationNotes) {
+        this.consultationNotes = consultationNotes;
+    }
+
+    public AppointmentStatus getConsultationStatus() {
+        return consultationStatus;
+    }
+
+    public void setConsultationStatus(AppointmentStatus consultationStatus) {
+        this.consultationStatus = consultationStatus;
+    }
+
+    public User getAssignedConsultant() {
+        return assignedConsultant;
+    }
+
+    public void setAssignedConsultant(User assignedConsultant) {
+        this.assignedConsultant = assignedConsultant;
     }
 }

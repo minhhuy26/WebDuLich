@@ -19,7 +19,7 @@
                     <div class="brand-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                     </div>
-                    <span>VietTravel Hub &bull; Điều Hành Lịch Hẹn</span>
+                    <span>VietTravel Hub &bull; Điều Hành Lịch Hẹn Tư Vấn</span>
                 </a>
                 <div class="nav-actions">
                     <a href="/admin" class="btn btn-secondary btn-sm">&larr; Về Dashboard</a>
@@ -34,13 +34,13 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
             <div>
                 <h1 style="font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 6px 0;">
-                    Điều Phối Lịch Hẹn Tư Vấn (Appointments)
+                    Điều Phối Lịch Hẹn Tư Vấn Sau Đặt Vé (Appointments)
                 </h1>
                 <p style="color: var(--text-muted); margin: 0; font-size: 14px;">
-                    Quy trình tiếp nhận, phân công nhân viên tư vấn và cập nhật trạng thái đơn hẹn khách hàng.
+                    Dữ liệu được tích hợp trực tiếp theo Đơn Đặt Vé (DonDatCho) - Chuẩn 4 bảng tối ưu CSDL.
                 </p>
             </div>
-            <a href="/appointments/schedule" class="btn btn-primary btn-sm">+ Thêm Cuộc Hẹn Mới</a>
+            <a href="/admin/reservations" class="btn btn-primary btn-sm">Xem Toàn Bộ Đơn Đặt Chỗ</a>
         </div>
 
         <!-- NOTIFICATIONS -->
@@ -53,44 +53,50 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>Mã Cuộc Hẹn</th>
+                            <th>Mã Đơn Vé</th>
                             <th>Khách Hàng</th>
                             <th>Số Điện Thoại</th>
                             <th>Thời Gian Hẹn</th>
                             <th>Phương Tiện</th>
+                            <th>Yêu Cầu Tư Vấn</th>
                             <th>Phụ Trách</th>
                             <th>Trạng Thái</th>
-                            <th>Cập Nhật Trạng Thái</th>
+                            <th>Cập Nhật Xử Lý</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(appointments)}">
-                            <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không có cuộc hẹn nào</td>
+                            <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">Hiện chưa có đơn đặt vé nào đăng ký lịch hẹn tư vấn.</td>
                         </tr>
                         <tr th:each="a : ${appointments}">
-                            <td><strong style="font-family: var(--font-mono); color: var(--primary);" th:text="${a.appointmentCode}">APT-001</strong></td>
-                            <td><strong th:text="${a.customerName}">Trần Văn An</strong></td>
-                            <td th:text="${a.phone}">0912345678</td>
-                            <td th:text="${#temporals.format(a.preferredDate, 'dd/MM/yyyy HH:mm')}">11/11/2026</td>
-                            <td><span class="badge badge-primary" th:text="${a.transportType.shortName}">Máy bay</span></td>
                             <td>
-                                <span th:if="${a.assignedOperator != null}" th:text="${a.assignedOperator.fullName}">Mai</span>
-                                <span th:if="${a.assignedOperator == null}" style="color: var(--text-muted); font-size: 12px;">Chưa gán</span>
+                                <a th:href="@{'/reservations/' + ${a.bookingCode}}" target="_blank" style="font-family: var(--font-mono); font-weight: 800; color: var(--primary); text-decoration: none;">
+                                    <span th:text="${a.bookingCode}">RES-001</span> &nearr;
+                                </a>
+                            </td>
+                            <td><strong th:text="${a.customerName}">Trần Văn An</strong></td>
+                            <td th:text="${a.customerPhone}">0912345678</td>
+                            <td th:text="${#temporals.format(a.consultationDate, 'dd/MM/yyyy HH:mm')}">11/11/2026 09:00</td>
+                            <td><span class="badge badge-primary" th:text="${a.transportType.shortName}">Máy bay</span></td>
+                            <td style="max-width: 220px; font-size: 13px;" th:text="${a.consultationNotes != null ? a.consultationNotes : '-'}">Tư vấn chọn ghế</td>
+                            <td>
+                                <span th:if="${a.assignedConsultant != null}" th:text="${a.assignedConsultant.fullName}">Mai</span>
+                                <span th:if="${a.assignedConsultant == null}" style="color: var(--text-muted); font-size: 12px; font-style: italic;">Chưa phân công</span>
                             </td>
                             <td>
-                                <span th:if="${a.status.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
-                                <span th:if="${a.status.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
-                                <span th:if="${a.status.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
-                                <span th:if="${a.status.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
+                                <span th:if="${a.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
+                                <span th:if="${a.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
+                                <span th:if="${a.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
                             </td>
                             <td>
                                 <form method="post" th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" style="display: flex; gap: 6px; align-items: center; margin: 0;">
                                     <select name="status" class="form-select" style="font-size: 12px; height: 32px; padding: 2px 6px;">
-                                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}" th:selected="${a.status == s}"></option>
+                                        <option th:each="s : ${statuses}" th:if="${s.name() != 'NONE'}" th:value="${s}" th:text="${s.displayName}" th:selected="${a.consultationStatus == s}"></option>
                                     </select>
                                     <select name="operatorId" class="form-select" style="font-size: 12px; height: 32px; padding: 2px 6px;">
-                                        <option value="">-- Gán nhân viên --</option>
-                                        <option th:each="op : ${operators}" th:value="${op.id}" th:text="${op.fullName}" th:selected="${a.assignedOperator != null and a.assignedOperator.id == op.id}"></option>
+                                        <option value="">-- Gán chuyên viên --</option>
+                                        <option th:each="op : ${operators}" th:value="${op.id}" th:text="${op.fullName}" th:selected="${a.assignedConsultant != null and a.assignedConsultant.id == op.id}"></option>
                                     </select>
                                     <button type="submit" class="btn btn-outline btn-sm" style="height: 32px; padding: 0 10px; font-size: 12px;">Lưu</button>
                                 </form>
@@ -102,6 +108,9 @@
         </div>
 
     </div>
+
+    <!-- FOOTER -->
+    <footer th:replace="~{fragments/footer :: app-footer}"></footer>
 
 </body>
 </html>

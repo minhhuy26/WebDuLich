@@ -22,19 +22,16 @@ public class HomeController {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final TransDetailRepository transDetailRepository;
-    private final AppointmentRepository appointmentRepository;
     private final DataSource dataSource;
 
     @Autowired
     public HomeController(UserRepository userRepository,
                           ReservationRepository reservationRepository,
                           TransDetailRepository transDetailRepository,
-                          AppointmentRepository appointmentRepository,
                           DataSource dataSource) {
         this.userRepository = userRepository;
         this.reservationRepository = reservationRepository;
         this.transDetailRepository = transDetailRepository;
-        this.appointmentRepository = appointmentRepository;
         this.dataSource = dataSource;
     }
 
@@ -50,7 +47,7 @@ public class HomeController {
             stats.setCustomerCount(reservationRepository.count());
             stats.setBookingCount(reservationRepository.count());
             stats.setPaymentCount(transDetailRepository.count());
-            stats.setConsultationCount(appointmentRepository.count());
+            stats.setConsultationCount(reservationRepository.countByHasConsultationTrue());
         } catch (Exception ex) {
             log.error("Không thể kết nối CSDL khi tải trang chủ: {}", ex.getMessage());
             stats.setDatabaseConnected(false);
