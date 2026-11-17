@@ -37,14 +37,14 @@ public class SecurityConfig {
 
                 // 4. Đặt lịch hẹn tư vấn trực tiếp (Workflow 4)
                 .requestMatchers("/appointments/schedule", "/appointments/new", "/appointments/success").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/appointments").permitAll()
-                .requestMatchers("/consultations/**").permitAll()
+                .requestMatchers("/consultations/schedule", "/consultations/new", "/consultations/success", "/consultations/book").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/appointments", "/consultations").permitAll()
 
                 // 5. Đăng ký & Đăng nhập
                 .requestMatchers("/login", "/register").permitAll()
 
                 // 6. Quản lý lịch hẹn tư vấn cho Nhân viên điều hành & Admin
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/appointments").hasAnyAuthority("ROLE_OPERATOR", "ROLE_AGENT", "ROLE_ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/appointments", "/consultations").hasAnyAuthority("ROLE_OPERATOR", "ROLE_AGENT", "ROLE_ADMIN")
 
                 // 7. Khu vực tra cứu đơn cá nhân
                 .requestMatchers("/my-bookings/**").hasAnyAuthority("ROLE_TRAVELER", "ROLE_AGENT", "ROLE_OPERATOR", "ROLE_ADMIN")

@@ -138,6 +138,17 @@
                     Danh Sách Vé Điện Tử &amp; Mã QR Code (Tem Số)
                 </h2>
 
+                <div th:if="${#lists.isEmpty(reservation.tickets)}" class="card" style="padding: 24px; text-align: center; color: var(--text-muted); margin-bottom: 20px;">
+                    <div th:if="${reservation.status.name() == 'CANCELLED'}">
+                        <strong style="color: var(--danger); font-size: 15px;">Đơn đặt vé này đã được hủy thành công.</strong>
+                        <p style="margin: 6px 0 0 0; font-size: 13px;">Toàn bộ chỗ ngồi đã được giải phóng và hoàn trả theo đúng chính sách hoàn vé của hệ thống.</p>
+                    </div>
+                    <div th:if="${reservation.status.name() == 'EXPIRED'}">
+                        <strong style="color: var(--text-muted); font-size: 15px;">Đơn giữ chỗ đã hết hạn 15 phút.</strong>
+                        <p style="margin: 6px 0 0 0; font-size: 13px;">Hệ thống đã tự động giải phóng chỗ ngồi. Quý khách vui lòng đặt vé mới.</p>
+                    </div>
+                </div>
+
                 <div th:each="t : ${reservation.tickets}" class="ticket-card">
                     <!-- TICKET INFO -->
                     <div style="flex: 1; min-width: 280px;">
@@ -223,10 +234,11 @@
                         <div style="background: #ffffff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Trạng thái tư vấn:</span>
-                                <span th:if="${reservation.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">⏳ Chờ chuyên viên gọi</span>
-                                <span th:if="${reservation.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">✅ Đã xác nhận hẹn</span>
-                                <span th:if="${reservation.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">🎉 Đã hoàn tất</span>
-                                <span th:if="${reservation.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">❌ Đã hủy</span>
+                                <span th:if="${reservation.consultationStatus?.name() == 'PENDING'}" class="badge badge-warning">⏳ Chờ chuyên viên gọi</span>
+                                <span th:if="${reservation.consultationStatus?.name() == 'CONFIRMED'}" class="badge badge-success">✅ Đã xác nhận hẹn</span>
+                                <span th:if="${reservation.consultationStatus?.name() == 'COMPLETED'}" class="badge badge-neutral">🎉 Đã hoàn tất</span>
+                                <span th:if="${reservation.consultationStatus?.name() == 'CANCELLED'}" class="badge badge-danger">❌ Đã hủy</span>
+                                <span th:if="${reservation.consultationStatus == null or reservation.consultationStatus?.name() == 'NONE'}" class="badge badge-neutral">Chưa đăng ký</span>
                             </div>
                             <div style="font-size: 13px; line-height: 1.6; color: #334155;">
                                 <div>Thời gian hẹn: <strong th:text="${#temporals.format(reservation.consultationDate, 'dd/MM/yyyy HH:mm')}">12/11/2026 09:00</strong></div>

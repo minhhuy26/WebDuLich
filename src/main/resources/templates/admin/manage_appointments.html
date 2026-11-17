@@ -84,15 +84,16 @@
                                 <span th:if="${a.assignedConsultant == null}" style="color: var(--text-muted); font-size: 12px; font-style: italic;">Chưa phân công</span>
                             </td>
                             <td>
-                                <span th:if="${a.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
-                                <span th:if="${a.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
-                                <span th:if="${a.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
-                                <span th:if="${a.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus?.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
+                                <span th:if="${a.consultationStatus?.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
+                                <span th:if="${a.consultationStatus?.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
+                                <span th:if="${a.consultationStatus?.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus == null or a.consultationStatus?.name() == 'NONE'}" class="badge badge-neutral">Chưa đăng ký</span>
                             </td>
                             <td>
                                 <form method="post" th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" style="display: flex; gap: 6px; align-items: center; margin: 0;">
                                     <select name="status" class="form-select" style="font-size: 12px; height: 32px; padding: 2px 6px;">
-                                        <option th:each="s : ${statuses}" th:if="${s.name() != 'NONE'}" th:value="${s}" th:text="${s.displayName}" th:selected="${a.consultationStatus == s}"></option>
+                                        <option th:each="s : ${statuses}" th:if="${s.name() != 'NONE'}" th:value="${s}" th:text="${s.displayName}" th:selected="${a.consultationStatus != null and a.consultationStatus == s}"></option>
                                     </select>
                                     <select name="operatorId" class="form-select" style="font-size: 12px; height: 32px; padding: 2px 6px;">
                                         <option value="">-- Gán chuyên viên --</option>

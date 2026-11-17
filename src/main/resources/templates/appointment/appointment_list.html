@@ -80,10 +80,11 @@
                                 <span th:if="${a.assignedConsultant == null}" style="color: var(--text-muted); font-size: 12px; font-style: italic;">(Chưa phân công)</span>
                             </td>
                             <td>
-                                <span th:if="${a.consultationStatus.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
-                                <span th:if="${a.consultationStatus.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
-                                <span th:if="${a.consultationStatus.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
-                                <span th:if="${a.consultationStatus.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus?.name() == 'PENDING'}" class="badge badge-warning">Chờ tiếp nhận</span>
+                                <span th:if="${a.consultationStatus?.name() == 'CONFIRMED'}" class="badge badge-success">Đã xác nhận</span>
+                                <span th:if="${a.consultationStatus?.name() == 'COMPLETED'}" class="badge badge-neutral">Đã hoàn tất</span>
+                                <span th:if="${a.consultationStatus?.name() == 'CANCELLED'}" class="badge badge-danger">Đã hủy</span>
+                                <span th:if="${a.consultationStatus == null or a.consultationStatus?.name() == 'NONE'}" class="badge badge-neutral">Chưa đăng ký</span>
                             </td>
                             <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;" th:text="${a.consultationNotes != null ? a.consultationNotes : '-'}">-</td>
                         </tr>

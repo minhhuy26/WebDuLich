@@ -144,7 +144,13 @@ public class AdminController {
             ticket.setArrivalTime(ticket.getDepartureTime().plusHours(3));
             ticket.setRouteInfo(ticket.getDeparturePlace() + " ➔ " + ticket.getArrivalPlace());
             ticket.setStatus(TicketStatus.AVAILABLE);
-            ticket.setFinalPrice(ticket.getBasePrice().add(ticket.getServiceFee()).add(ticket.getExtraFee()));
+            BigDecimal base = ticket.getBasePrice() != null ? ticket.getBasePrice() : BigDecimal.ZERO;
+            BigDecimal service = ticket.getServiceFee() != null ? ticket.getServiceFee() : BigDecimal.ZERO;
+            BigDecimal extra = ticket.getExtraFee() != null ? ticket.getExtraFee() : BigDecimal.ZERO;
+            ticket.setBasePrice(base);
+            ticket.setServiceFee(service);
+            ticket.setExtraFee(extra);
+            ticket.setFinalPrice(base.add(service).add(extra));
             ticketRepository.save(ticket);
             redirectAttributes.addFlashAttribute("successMessage", "Thêm vé/chuyến mới vào kho thành công!");
         } catch (Exception ex) {

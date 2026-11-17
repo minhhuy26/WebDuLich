@@ -73,6 +73,11 @@ public class AppointmentController {
                                       Model model,
                                       RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
+            if (appointment.getBookingCode() != null && !appointment.getBookingCode().trim().isEmpty()) {
+                try {
+                    model.addAttribute("reservation", appointmentService.findByBookingCode(appointment.getBookingCode().trim()));
+                } catch (Exception ignored) {}
+            }
             model.addAttribute("transportTypes", TransportType.values());
             return "appointment/appointment_form";
         }
@@ -90,6 +95,11 @@ public class AppointmentController {
             // PRG Pattern: Redirect 303 sang màn hình xác nhận hoặc chi tiết đơn
             return "redirect:/appointments/success?code=" + updated.getBookingCode();
         } catch (BusinessException ex) {
+            if (appointment.getBookingCode() != null && !appointment.getBookingCode().trim().isEmpty()) {
+                try {
+                    model.addAttribute("reservation", appointmentService.findByBookingCode(appointment.getBookingCode().trim()));
+                } catch (Exception ignored) {}
+            }
             model.addAttribute("transportTypes", TransportType.values());
             model.addAttribute("errorMessage", ex.getMessage());
             return "appointment/appointment_form";
